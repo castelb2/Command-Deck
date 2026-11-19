@@ -2,13 +2,15 @@
    App files: served from cache, refreshed in the background.
    Google Fonts: cached the first time they load.
    api.anthropic.com and anything else: never cached, always straight to the network. */
-const VERSION = "deck-v1.0.0";
+const VERSION = "deck-v1.1.0";
 const SHELL = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "js/local-db.js",
   "js/ai.js",
+  "js/se-model.js",
+  "js/se-ui.js",
   "icons/apple-touch-icon.png",
   "icons/icon-192.png",
   "icons/icon-512.png",
