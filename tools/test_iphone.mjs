@@ -10,6 +10,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const [exe, backup, outDir] = process.argv.slice(2);
+// Use whatever project comes first in the backup, so no personal names live in this file.
+const sample = JSON.parse(fs.readFileSync(backup, "utf8"));
+const projectIds = Object.keys(sample.collections.projects || {});
+const pid = projectIds.find(id => sample.collections.projects[id].status !== "watch") || projectIds[0];
+const pname = sample.collections.projects[pid].name;
 const root = process.env.DECK_ROOT || path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -41,8 +46,8 @@ function mockReplies() {
         { type: "content_block_delta", index: 0, delta: { type: "signature_delta", signature: "sig123" } },
         { type: "content_block_stop", index: 0 },
         { type: "content_block_start", index: 1, content_block: { type: "tool_use", id: "tu1", name: "update_project", input: {} } },
-        { type: "content_block_delta", index: 1, delta: { type: "input_json_delta", partial_json: "{\"id\":\"mu-flow-" } },
-        { type: "content_block_delta", index: 1, delta: { type: "input_json_delta", partial_json: "payload\",\"status\":\"watch\"}" } },
+        { type: "content_block_delta", index: 1, delta: { type: "input_json_delta", partial_json: JSON.stringify({ id: pid }).slice(0, -1) } },
+        { type: "content_block_delta", index: 1, delta: { type: "input_json_delta", partial_json: ",\"status\":\"watch\"}" } },
         { type: "content_block_stop", index: 1 },
         { type: "message_delta", delta: { stop_reason: "tool_use" } },
         { type: "message_stop" }
@@ -51,7 +56,7 @@ function mockReplies() {
     return route.fulfill({ status: 200, headers: { "content-type": "text/event-stream", "access-control-allow-origin": "*" }, body: sse([
       { type: "message_start", message: { id: "m2", role: "assistant", content: [] } },
       { type: "content_block_start", index: 0, content_block: { type: "text", text: "" } },
-      { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: "Done. The payload is on watch now." } },
+      { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: "Done. It is on watch now." } },
       { type: "content_block_stop", index: 0 },
       { type: "message_delta", delta: { stop_reason: "end_turn" } },
       { type: "message_stop" }
@@ -81,14 +86,14 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.click("#open-settings");
   await page.setInputFiles("#d-import", backup);
   await page.waitForTimeout(300);
-  check(`${tag} import message`, /Imported 10 projects/.test(await page.textContent("#d-msg")), await page.textContent("#d-msg"));
+  check(`${tag} import message`, new RegExp(`Imported ${projectIds.length} project`).test(await page.textContent("#d-msg")), await page.textContent("#d-msg"));
   const keyType = await page.getAttribute("#s-key", "type");
   check(`${tag} key field is masked`, keyType === "password");
   await page.screenshot({ path: path.join(outDir, `${tag}-settings.png`) });
   await page.click("#settings-drawer [data-close]");
   await page.waitForTimeout(200);
   const cards = await page.$$eval(".card", n => n.length);
-  check(`${tag} 10 project cards`, cards === 10, String(cards));
+  check(`${tag} all project cards shown`, cards === projectIds.length, String(cards));
 
   // Layout: no sideways page scroll, inputs at 16px, tap targets
   const lay = await page.evaluate(() => ({
@@ -103,11 +108,11 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.screenshot({ path: path.join(outDir, `${tag}-full.png`), fullPage: true });
 
   // Offline answers
-  await page.fill("#ask-input", "How many weeks until race day, and what should I focus on?");
+  await page.fill("#ask-input", "What deadlines are coming up?");
   await page.click("#ask-send");
   await page.waitForTimeout(300);
   const ans = await page.$$eval(".turn.ai .txt", n => n.map(x => x.textContent).pop() || "");
-  check(`${tag} offline answer about the race`, /Ironman 70\.3/.test(ans) && /week/.test(ans), ans.slice(0, 140));
+  check(`${tag} offline answer about deadlines`, ans.length > 20 && /week|day/i.test(ans), ans.slice(0, 140));
   await page.fill("#ask-input", "What needs my attention this week?");
   await page.click("#ask-send");
   await page.waitForTimeout(300);
@@ -126,10 +131,10 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.click("#s-key-save");
   check(`${tag} key saved and masked`, /Key saved · sk-ant-…0000/.test(await page.textContent("#s-key-state")), await page.textContent("#s-key-state"));
   await page.click("#settings-drawer [data-close]");
-  await page.fill("#ask-input", "Mark the payload as on watch");
+  await page.fill("#ask-input", `Mark ${pname} as on watch`);
   await page.click("#ask-send");
   await page.waitForFunction(() => [...document.querySelectorAll(".turn.ai .txt")].some(n => n.textContent.includes("on watch now")), null, { timeout: 5000 }).catch(() => {});
-  const status = await page.evaluate(() => JSON.parse(localStorage.getItem("deck.db.projects"))["mu-flow-payload"].status);
+  const status = await page.evaluate(id => JSON.parse(localStorage.getItem("deck.db.projects"))[id].status, pid);
   check(`${tag} API tool call changed the board`, status === "watch", status);
   const h0 = mock.seen[0] && mock.seen[0].headers || {};
   check(`${tag} API headers`, h0["x-api-key"] && h0["anthropic-dangerous-direct-browser-access"] === "true" && h0["anthropic-version"], Object.keys(h0).filter(k => k.startsWith("anthropic") || k === "x-api-key").join(","));
@@ -149,7 +154,7 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.reload({ waitUntil: "load" }).catch(e => errors.push("offline reload: " + e.message));
   await page.waitForTimeout(500);
   const offCards = await page.$$eval(".card", n => n.length).catch(() => 0);
-  check(`${tag} opens offline with data`, offCards === 10, String(offCards));
+  check(`${tag} opens offline with data`, offCards === projectIds.length, String(offCards));
   await ctx.setOffline(false);
 
   const manifest = await page.evaluate(async () => (await fetch("manifest.webmanifest")).json());

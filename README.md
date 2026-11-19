@@ -82,13 +82,13 @@ Run on 2026-11-19 with `node tools/test_iphone.mjs <chromium> <backup.json> <out
 | Check | Requirement | Result |
 |---|---|---|
 | Empty board offers import | R4 | Pass |
-| Import reports 10 projects | R3, R4 | Pass |
-| 10 project cards after import | R3, R4 | Pass |
+| Import reports every project | R3, R4 | Pass |
+| Every project card shown after import | R3, R4 | Pass |
 | Key field is masked | R9 | Pass |
 | No sideways page scroll | R5 | Pass |
 | Inputs at 16 px or more | R6 | Pass |
 | Buttons 36 px or taller | R6 | Pass |
-| Offline answer about the race | R8 | Pass |
+| Offline answer about deadlines | R8 | Pass |
 | Offline "what needs my attention" | R8 | Pass |
 | Offline "add to my daily routine" | R8 | Pass |
 | Key saved and shown masked | R9 | Pass |
