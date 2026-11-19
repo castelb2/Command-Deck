@@ -73,7 +73,7 @@ For better speech, download an Enhanced voice in iPhone Settings > Accessibility
 | R9 | Optional Claude link, with the key kept on the phone | Key stored only on the device, masked in Settings, sent only to api.anthropic.com, left out of backups |
 | R10 | Claude can change the board when linked | Tool use (update a project, change the checklist), with inputs checked before they run |
 | R11 | Runs without script errors in a current iPhone browser | No regex lookbehind; checked headless |
-| R13 | Each project is Personal, or Work in Weekend, Black Swan or NASA | Personal or work dropdown in the project form; a Work area dropdown appears only for Work. Stored as `area` (`personal` or `work`) and `category` (`Personal`, `Weekend`, `Black Swan` or `NASA`) |
+| R13 | Each project is Personal, or Work in Weekend, Black Swan or NASA | Personal or work dropdown in the project form; a Work area dropdown appears only for Work. Stored as `area` (`personal` or `work`), `category` (`Personal`, `Weekend`, `Black Swan` or `NASA`) and, for Work, `tier` (`weekend`, `blackswan` or `nasa`; `null` for Personal) |
 | R12 | Changes are traceable | Git history in small commits, and `DELETE_LOG.md` |
 
 ## Verification

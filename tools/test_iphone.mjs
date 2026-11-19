@@ -134,7 +134,7 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.waitForTimeout(300);
   const saved = await page.evaluate(id => JSON.parse(localStorage.getItem("deck.db.projects"))[id], pid);
   check(`${tag} work area dropdown appears for Work`, groupShown);
-  check(`${tag} saves Work · NASA`, saved.area === "work" && saved.category === "NASA", `${saved.area}/${saved.category}`);
+  check(`${tag} saves Work · NASA`, saved.area === "work" && saved.category === "NASA" && saved.tier === "nasa", `${saved.area}/${saved.category}`);
   check(`${tag} card shows Work · NASA`, await page.evaluate(() => [...document.querySelectorAll(".card-cat")].some(n => n.textContent === "Work · NASA")));
   await page.locator(".card", { hasText: pname }).first().getByRole("button", { name: "Edit", exact: true }).click();
   await page.waitForTimeout(200);
@@ -145,7 +145,7 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.waitForTimeout(300);
   const saved2 = await page.evaluate(id => JSON.parse(localStorage.getItem("deck.db.projects"))[id], pid);
   check(`${tag} editor reopens on Work · NASA`, reopened[0] === "work" && reopened[1] === "NASA" && reopened[2] === false, reopened.join(","));
-  check(`${tag} Personal hides the work area and saves`, groupHidden && saved2.area === "personal" && saved2.category === "Personal", `${saved2.area}/${saved2.category}`);
+  check(`${tag} Personal hides the work area and saves`, groupHidden && saved2.area === "personal" && saved2.category === "Personal" && saved2.tier === null, `${saved2.area}/${saved2.category}`);
 
   // API link against a mocked api.anthropic.com
   const mock = mockReplies();

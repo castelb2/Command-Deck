@@ -676,13 +676,21 @@ const writeChain = new Map();
 const core = { cv: $("#core"), ctx: null, size: 0, level: 0.06, kick: 0, state: "standby", t0: performance.now(), raf: 0 };
 
 // Each project is Personal, or Work in one of three areas.
-// Stored as area ("personal" | "work") plus category ("Personal", "Weekend", "Black Swan" or "NASA").
+// Stored as area ("personal" | "work") plus category ("Personal", "Weekend", "Black Swan" or "NASA"),
+// and, for Work, tier ("weekend" | "blackswan" | "nasa") to match the tiered-dashboards branch.
 const WORK_GROUPS = ["Weekend", "Black Swan", "NASA"];
 const CATEGORIES = ["Personal"].concat(WORK_GROUPS);
 function areaOf(category) {
   const c = String(category || "").trim().toLowerCase();
   if (c === "personal") return "personal";
   return WORK_GROUPS.some(g => g.toLowerCase() === c) ? "work" : "";
+}
+function tierOf(category) {
+  const c = canonicalCategory(category);
+  return WORK_GROUPS.includes(c) ? c.toLowerCase().replace(/\s+/g, "") : null;
+}
+function categoryOfTier(tier) {
+  return WORK_GROUPS.find(g => g.toLowerCase().replace(/\s+/g, "") === String(tier || "").toLowerCase()) || "";
 }
 function canonicalCategory(category) {
   const c = String(category || "").trim().toLowerCase();
@@ -693,6 +701,7 @@ function normalize(id, d) {
   p.id = id;
   p.category = p.category ? String(p.category) : "";
   if (canonicalCategory(p.category)) p.category = canonicalCategory(p.category);
+  else if (categoryOfTier(p.tier)) p.category = categoryOfTier(p.tier);
   p.area = p.area === "personal" || p.area === "work" ? p.area : areaOf(p.category);
   p.name = String(p.name || "Untitled project");
   p.status = STATUS[p.status] ? p.status : "active";
@@ -1585,7 +1594,7 @@ const updateTool = {
     if (input.category != null && input.category !== "") {
       const c = canonicalCategory(input.category);
       if (!c) throw new Error("category must be one of " + CATEGORIES.join(", "));
-      patch.category = c; patch.area = areaOf(c); changes.push("category → " + (c === "Personal" ? c : "Work · " + c));
+      patch.category = c; patch.area = areaOf(c); patch.tier = tierOf(c); changes.push("category → " + (c === "Personal" ? c : "Work · " + c));
     }
     if (input.next_action != null) { patch.next = String(input.next_action).slice(0, 220); changes.push(patch.next ? "next action set" : "next action cleared"); }
     if (input.due != null) {
@@ -1842,10 +1851,10 @@ function openEditor(id) {
 $("#f-area").addEventListener("change", () => { $("#f-group-wrap").hidden = $("#f-area").value !== "work"; });
 function categoryFromForm(old) {
   const area = $("#f-area").value;
-  if (area === "personal") return { area, category: "Personal" };
-  if (area === "work") return { area, category: $("#f-group").value };
+  if (area === "personal") return { area, category: "Personal", tier: null };
+  if (area === "work") return { area, category: $("#f-group").value, tier: tierOf($("#f-group").value) };
   // Not set: keep whatever label an older project already had.
-  return { area: "", category: old && !areaOf(old.category) ? old.category : "" };
+  return { area: "", category: old && !areaOf(old.category) ? old.category : "", tier: null };
 }
 function lines(v) { return String(v || "").split("\n").map(s => s.trim()).filter(Boolean).slice(0, 20); }
 function slug(s) { return (String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project") + "-" + Math.random().toString(36).slice(2, 6); }
