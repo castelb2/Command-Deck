@@ -623,7 +623,7 @@
       const miss = spec.fields(p).find(fd => fd.req && !String(d[fd.k] == null ? "" : d[fd.k]).trim());
       if (miss) { f.err = miss.label + " can't be empty."; render(); return; }
       const item = clone(d); delete item.delReason;
-      if (f.index == null && spec.idPrefix) item.id = S.nextId(p.se[list], spec.idPrefix, spec.idWidth);
+      if (f.index == null && spec.idPrefix) item.id = S.nextId(p.se[list], spec.idPrefix, spec.idWidth, p.se.deletions.map(x => x.item));
       const ok = await run(p, se => { if (f.index == null) se[list].push(item); else se[list][f.index] = item; },
         (f.index == null ? "Added " : "Saved ") + spec.noun + (item.id ? " " + item.id : "") + ".");
       if (ok) { st.form = null; render(); }
