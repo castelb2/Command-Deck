@@ -123,6 +123,30 @@ for (const [w, h] of [[390, 844], [430, 932]]) {
   await page.waitForTimeout(300);
   check(`${tag} offline add to routine`, (await page.textContent("#check-daily-list")).includes("stretch 10 minutes"));
 
+  // Personal or Work, then Weekend / Black Swan / NASA under Work
+  await page.locator(".card", { hasText: pname }).first().getByRole("button", { name: "Edit", exact: true }).click();
+  await page.waitForTimeout(200);
+  await page.selectOption("#f-area", "work");
+  const groupShown = await page.isVisible("#f-group");
+  await page.selectOption("#f-group", "NASA");
+  await page.screenshot({ path: path.join(outDir, `${tag}-category.png`) });
+  await page.click("#f-save");
+  await page.waitForTimeout(300);
+  const saved = await page.evaluate(id => JSON.parse(localStorage.getItem("deck.db.projects"))[id], pid);
+  check(`${tag} work area dropdown appears for Work`, groupShown);
+  check(`${tag} saves Work · NASA`, saved.area === "work" && saved.category === "NASA", `${saved.area}/${saved.category}`);
+  check(`${tag} card shows Work · NASA`, await page.evaluate(() => [...document.querySelectorAll(".card-cat")].some(n => n.textContent === "Work · NASA")));
+  await page.locator(".card", { hasText: pname }).first().getByRole("button", { name: "Edit", exact: true }).click();
+  await page.waitForTimeout(200);
+  const reopened = await page.evaluate(() => [document.querySelector("#f-area").value, document.querySelector("#f-group").value, document.querySelector("#f-group-wrap").hidden]);
+  await page.selectOption("#f-area", "personal");
+  const groupHidden = !(await page.isVisible("#f-group"));
+  await page.click("#f-save");
+  await page.waitForTimeout(300);
+  const saved2 = await page.evaluate(id => JSON.parse(localStorage.getItem("deck.db.projects"))[id], pid);
+  check(`${tag} editor reopens on Work · NASA`, reopened[0] === "work" && reopened[1] === "NASA" && reopened[2] === false, reopened.join(","));
+  check(`${tag} Personal hides the work area and saves`, groupHidden && saved2.area === "personal" && saved2.category === "Personal", `${saved2.area}/${saved2.category}`);
+
   // API link against a mocked api.anthropic.com
   const mock = mockReplies();
   await page.route("https://api.anthropic.com/v1/messages", mock.handler);

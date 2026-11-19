@@ -73,11 +73,12 @@ For better speech, download an Enhanced voice in iPhone Settings > Accessibility
 | R9 | Optional Claude link, with the key kept on the phone | Key stored only on the device, masked in Settings, sent only to api.anthropic.com, left out of backups |
 | R10 | Claude can change the board when linked | Tool use (update a project, change the checklist), with inputs checked before they run |
 | R11 | Runs without script errors in a current iPhone browser | No regex lookbehind; checked headless |
+| R13 | Each project is Personal, or Work in Weekend, Black Swan or NASA | Personal or work dropdown in the project form; a Work area dropdown appears only for Work. Stored as `area` (`personal` or `work`) and `category` (`Personal`, `Weekend`, `Black Swan` or `NASA`) |
 | R12 | Changes are traceable | Git history in small commits, and `DELETE_LOG.md` |
 
 ## Verification
 
-Run on 2026-11-19 with `node tools/test_iphone.mjs <chromium> <backup.json> <out-dir>` (Chromium in iPhone mode with touch, at 390×844 and 430×932; the Claude API was mocked). **40 of 40 checks passed** (20 per size).
+Run on 2026-11-19 with `node tools/test_iphone.mjs <chromium> <backup.json> <out-dir>` (Chromium in iPhone mode with touch, at 390×844 and 430×932; the Claude API was mocked). **50 of 50 checks passed** (25 per size).
 
 | Check | Requirement | Result |
 |---|---|---|
@@ -100,6 +101,10 @@ Run on 2026-11-19 with `node tools/test_iphone.mjs <chromium> <backup.json> <out
 | Service worker controls the page | R2 | Pass |
 | Reopens offline with the data | R2, R3 | Pass |
 | Manifest is standalone, named Command Deck | R1 | Pass |
+| Work area dropdown appears only for Work | R13 | Pass |
+| Saves Work · NASA and shows it on the card | R13 | Pass |
+| Editor reopens on Work · NASA | R13 | Pass |
+| Personal hides the work area and saves | R13 | Pass |
 | No script errors | R11 | Pass |
 
 **Still to check on the phone itself** (a headless browser can't do these):

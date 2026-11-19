@@ -524,7 +524,6 @@ body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;
   <form class="form" id="edit-form" autocomplete="off">
     <label for="f-name">Name<input id="f-name" type="text" required maxlength="80"></label>
     <div class="row2">
-      <label for="f-cat">Category<input id="f-cat" type="text" maxlength="30" placeholder="Research"></label>
       <label for="f-status">Status<select id="f-status">
         <option value="active">Active</option>
         <option value="watch">Watch</option>
@@ -532,7 +531,17 @@ body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;
         <option value="parked">Parked</option>
         <option value="done">Done</option>
       </select></label>
+      <label for="f-area">Personal or work<select id="f-area">
+        <option value="">Not set</option>
+        <option value="personal">Personal</option>
+        <option value="work">Work</option>
+      </select></label>
     </div>
+    <label for="f-group" id="f-group-wrap" hidden>Work area<select id="f-group">
+      <option value="Weekend">Weekend</option>
+      <option value="Black Swan">Black Swan</option>
+      <option value="NASA">NASA</option>
+    </select></label>
     <label for="f-org">Where / with whom<input id="f-org" type="text" maxlength="90" placeholder="ERAU · lab, team or client"></label>
     <label for="f-mission">Mission<textarea id="f-mission" rows="2" maxlength="320"></textarea></label>
     <label for="f-next">Next action<textarea id="f-next" rows="2" maxlength="220" placeholder="The very next concrete step"></textarea></label>
@@ -666,9 +675,25 @@ let checklist = [], checkLoaded = false, logs = [], logLoaded = false, selectedD
 const writeChain = new Map();
 const core = { cv: $("#core"), ctx: null, size: 0, level: 0.06, kick: 0, state: "standby", t0: performance.now(), raf: 0 };
 
+// Each project is Personal, or Work in one of three areas.
+// Stored as area ("personal" | "work") plus category ("Personal", "Weekend", "Black Swan" or "NASA").
+const WORK_GROUPS = ["Weekend", "Black Swan", "NASA"];
+const CATEGORIES = ["Personal"].concat(WORK_GROUPS);
+function areaOf(category) {
+  const c = String(category || "").trim().toLowerCase();
+  if (c === "personal") return "personal";
+  return WORK_GROUPS.some(g => g.toLowerCase() === c) ? "work" : "";
+}
+function canonicalCategory(category) {
+  const c = String(category || "").trim().toLowerCase();
+  return CATEGORIES.find(x => x.toLowerCase() === c) || "";
+}
 function normalize(id, d) {
   const p = Object.assign({}, d || {});
   p.id = id;
+  p.category = p.category ? String(p.category) : "";
+  if (canonicalCategory(p.category)) p.category = canonicalCategory(p.category);
+  p.area = p.area === "personal" || p.area === "work" ? p.area : areaOf(p.category);
   p.name = String(p.name || "Untitled project");
   p.status = STATUS[p.status] ? p.status : "active";
   p.components = Array.isArray(p.components) ? p.components.map(String) : [];
@@ -776,7 +801,7 @@ function card(p) {
   c.setAttribute("aria-label", p.name + ", " + STATUS[p.status].label);
 
   const head = el("div", "card-head");
-  head.append(el("span", "card-cat", p.category || "Project"));
+  head.append(el("span", "card-cat", p.area === "work" ? "Work · " + p.category : (p.category || "Project")));
   head.append(el("span", "pill", STATUS[p.status].label));
   c.append(head);
 
@@ -1512,7 +1537,7 @@ function disableAsk(msg) {
 }
 function registrySnapshot() {
   return sorted(projects).map(p => ({
-    id: p.id, name: p.name, category: p.category || "", where: p.org || "", status: p.status,
+    id: p.id, name: p.name, area: p.area || "", category: p.category || "", where: p.org || "", status: p.status,
     mission: p.mission || "", components: p.components, flags: p.flags, next_action: p.next || "",
     due: p.due || "", days_until_due: p.due ? daysUntil(p.due) : null,
     progress_percent: p.progress, notes: (p.notes || "").slice(-600)
@@ -1538,6 +1563,7 @@ const updateTool = {
     properties: {
       id: { type: "string", description: "The project's id, exactly as given in the registry." },
       status: { type: "string", enum: STATUS_ORDER, description: "New status." },
+      category: { type: "string", enum: CATEGORIES, description: "Personal, or one of the work areas: Weekend, Black Swan, NASA." },
       next_action: { type: "string", description: "New next action. Empty string clears it." },
       due: { type: "string", description: "Due date as YYYY-MM-DD. Empty string clears it." },
       progress_percent: { type: "number", description: "0 to 100." },
@@ -1555,6 +1581,11 @@ const updateTool = {
       const s = String(input.status).toLowerCase();
       if (!STATUS[s]) throw new Error("status must be one of " + STATUS_ORDER.join(", "));
       patch.status = s; changes.push("status → " + STATUS[s].label);
+    }
+    if (input.category != null && input.category !== "") {
+      const c = canonicalCategory(input.category);
+      if (!c) throw new Error("category must be one of " + CATEGORIES.join(", "));
+      patch.category = c; patch.area = areaOf(c); changes.push("category → " + (c === "Personal" ? c : "Work · " + c));
     }
     if (input.next_action != null) { patch.next = String(input.next_action).slice(0, 220); changes.push(patch.next ? "next action set" : "next action cleared"); }
     if (input.due != null) {
@@ -1790,7 +1821,10 @@ function openEditor(id) {
   $("#edit-eyebrow").textContent = p ? "Edit project" : "New project";
   $("#edit-title").textContent = p ? p.name : "Add to the registry";
   $("#f-name").value = p ? p.name : "";
-  $("#f-cat").value = p ? (p.category || "") : "";
+  const area = p ? p.area : "";
+  $("#f-area").value = area;
+  $("#f-group").value = p && WORK_GROUPS.includes(p.category) ? p.category : WORK_GROUPS[0];
+  $("#f-group-wrap").hidden = area !== "work";
   $("#f-status").value = p ? p.status : "active";
   $("#f-org").value = p ? (p.org || "") : "";
   $("#f-mission").value = p ? (p.mission || "") : "";
@@ -1805,6 +1839,14 @@ function openEditor(id) {
   $("#save-msg").textContent = ""; $("#save-msg").classList.remove("bad");
   openDrawer($("#edit-drawer"));
 }
+$("#f-area").addEventListener("change", () => { $("#f-group-wrap").hidden = $("#f-area").value !== "work"; });
+function categoryFromForm(old) {
+  const area = $("#f-area").value;
+  if (area === "personal") return { area, category: "Personal" };
+  if (area === "work") return { area, category: $("#f-group").value };
+  // Not set: keep whatever label an older project already had.
+  return { area: "", category: old && !areaOf(old.category) ? old.category : "" };
+}
 function lines(v) { return String(v || "").split("\n").map(s => s.trim()).filter(Boolean).slice(0, 20); }
 function slug(s) { return (String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project") + "-" + Math.random().toString(36).slice(2, 6); }
 $("#edit-form").addEventListener("submit", async e => {
@@ -1814,7 +1856,7 @@ $("#edit-form").addEventListener("submit", async e => {
   const prog = $("#f-progress").value.trim();
   const data = {
     name: $("#f-name").value.trim() || "Untitled project",
-    category: $("#f-cat").value.trim(),
+    ...categoryFromForm(editing ? projects.find(x => x.id === editing) : null),
     status: $("#f-status").value,
     org: $("#f-org").value.trim(),
     mission: $("#f-mission").value.trim(),
