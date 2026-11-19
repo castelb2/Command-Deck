@@ -7,7 +7,7 @@ The original deck on claude.ai is untouched. This repository holds the app only.
 ## Install on your iPhone
 
 1. **Host the folder over HTTPS.** Either:
-   - **GitHub Pages:** in this repository, open Settings > Pages, choose "Deploy from a branch", pick `main` and `/ (root)`, and save. The app appears at `https://<your-user>.github.io/Command-Deck/` after a minute or two.
+   - **GitHub Pages:** in this repository, open Settings > Pages, choose "Deploy from a branch", pick `main` and `/ (root)`, and save. The app appears at `https://<your-user>.github.io/Command-Deck/` after a minute or two. GitHub hosts Pages for a private repository only on a paid plan; on a free plan it asks you to upgrade or make the repository public.
    - **Netlify Drop:** drag this folder onto app.netlify.com/drop.
 2. **Open that address in Safari** on the iPhone (it has to be Safari).
 3. Tap **Share**, then **Add to Home Screen**, then **Add**.
