@@ -19,6 +19,8 @@
 <style>html,body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}*,*::before,*::after{box-sizing:border-box}</style>
 <script src="js/local-db.js"></script>
 <script src="js/ai.js"></script>
+<script src="js/se-model.js"></script>
+<script src="js/se-ui.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -315,6 +317,133 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
 .confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,107,107,.5);color:var(--ink)}
 .hint{margin:0;font-size:13.5px;color:var(--ink-2)}
 
+/* Tiered projects: Weekend / Black Swan / NASA (Lean Systems Engineering) */
+:root{--t-weekend:#9FE870;--t-blackswan:#C9A7FF;--t-nasa:#EEF3F6}
+.tier-badge[data-tier="weekend"],.card[data-tier="weekend"],.drawer[data-tier="weekend"]{--tc:var(--t-weekend)}
+.tier-badge[data-tier="blackswan"],.card[data-tier="blackswan"],.drawer[data-tier="blackswan"]{--tc:var(--t-blackswan)}
+.tier-badge[data-tier="nasa"],.card[data-tier="nasa"],.drawer[data-tier="nasa"]{--tc:var(--t-nasa)}
+.tier-badge{flex:none;font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;line-height:1.3;color:var(--void);background:var(--tc,var(--holo))}
+.card-head .tags{display:flex;align-items:center;gap:6px;flex:none}
+.card-se{display:grid;gap:7px;padding:9px 10px;border:1px solid var(--line);background:rgba(0,0,0,.18)}
+.card-phase{display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;color:var(--ink-2)}
+.card-phase .ph{color:var(--tc);text-transform:uppercase;letter-spacing:.08em}
+.mini-track{display:flex;align-items:center;gap:3px}
+.mt-ph{flex:1;height:6px;background:rgba(79,216,255,.12)}
+.mt-ph.past{background:rgba(79,216,255,.4);background:color-mix(in srgb, var(--tc) 50%, transparent)}
+.mt-ph.now{background:var(--tc);box-shadow:0 0 8px var(--tc)}
+.mt-gate{flex:none;width:8px;height:8px;transform:rotate(45deg);border:1.5px solid var(--line-2)}
+.mt-gate.pass{background:var(--ok);border-color:var(--ok)}
+.mt-gate.waived{background:var(--amber);border-color:var(--amber)}
+.mt-gate.nogo{background:var(--alert);border-color:var(--alert)}
+.mt-gate.skipped{border-color:var(--amber)}
+.mt-gate.due{border-color:var(--tc)}
+
+.drawer.mission{width:min(760px,100%)}
+.m-body{display:grid;gap:16px;min-width:0}
+.m-summary{display:grid;gap:6px}
+.m-sumtop{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.m-phase{font-family:var(--font-display);font-weight:600;font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.m-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.m-h3{font-size:17px;letter-spacing:.04em;text-transform:uppercase}
+.m-track{display:grid;grid-template-columns:repeat(5,minmax(0,1fr) 22px) minmax(0,1fr)}
+.m-ph{display:grid;justify-items:center;align-content:center;gap:1px;min-height:56px;min-width:0;padding:6px 2px;border:1px solid var(--line);background:transparent;color:var(--ink-2);cursor:pointer;font-family:var(--font-mono);line-height:1.15}
+.m-ph .k{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--ink)}
+.m-ph .q{font-size:9.5px;letter-spacing:.1em}
+.m-ph .n{font-size:10px;color:var(--ink-3)}
+.m-ph.past{border-color:var(--line-2);border-color:color-mix(in srgb, var(--tc) 45%, transparent)}
+.m-ph.now{border-color:var(--tc);background:rgba(79,216,255,.08);background:color-mix(in srgb, var(--tc) 12%, transparent)}
+.m-ph.now .k{color:var(--tc)}
+.m-ph.view{outline:1px dashed var(--holo);outline-offset:2px}
+.m-gate,.m-link{position:relative;min-height:56px}
+.m-gate{display:grid;place-items:center;padding:0;border:0;background:transparent;cursor:pointer;color:var(--ink-3)}
+.m-gate::before,.m-link::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line-2)}
+.m-gate i{position:relative;width:12px;height:12px;transform:rotate(45deg);border:1.5px solid var(--line-2);background:var(--deck)}
+.m-gate .gl{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;letter-spacing:.04em}
+.m-gate.pass i{background:var(--ok);border-color:var(--ok);box-shadow:0 0 8px var(--ok)}
+.m-gate.pass .gl{color:var(--ok)}
+.m-gate.waived i{background:var(--amber);border-color:var(--amber);box-shadow:none}
+.m-gate.nogo i{background:var(--alert);border-color:var(--alert)}
+.m-gate.skipped i{border-color:var(--amber);background:rgba(255,181,71,.25)}
+.m-gate.skipped .gl,.m-gate.waived .gl{color:var(--amber)}
+.m-gate.due i{border-color:var(--tc);animation:blink 1.6s ease-in-out infinite}
+.m-gate.due .gl{color:var(--tc)}
+.m-musk-wrap{display:grid;gap:6px}
+.m-musk{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.mk{display:grid;gap:2px;padding:6px 6px 7px;border:1px solid var(--line);color:var(--ink-3);min-width:0}
+.mk .d{font-family:var(--font-display);font-weight:600;font-size:15px;line-height:1}
+.mk .t{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk.on{border-color:var(--holo);color:var(--holo);background:rgba(79,216,255,.08)}
+.m-rule{font-size:12.5px}
+.m-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.m-alerts{display:grid;gap:6px}
+.m-metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:10px}
+.m-metrics .tele-value{font-size:30px}
+.m-mission{display:grid;gap:10px}
+.m-mission .panel-label{margin-bottom:0}
+.m-missiontext{margin:0;font-size:15px;color:var(--ink)}
+.m-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-margin-top:16px}
+.m-tabs .filter{flex:none}
+.m-tabs .filter[aria-selected="true"]{border-color:var(--holo);color:var(--holo);background:rgba(79,216,255,.08)}
+.m-tabs .filter[aria-selected="true"] .n{color:var(--holo)}
+.m-tab{display:grid;gap:12px;min-width:0}
+.m-tabbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.m-phasehead{display:grid;gap:4px}
+.check-tag.musk{color:var(--holo)}
+.m-gatecard{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px dashed var(--line-2);border-color:var(--tc,var(--line-2))}
+.m-gatecard > div{display:grid;gap:2px;min-width:0}
+.m-gatecard .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tc,var(--holo))}
+.m-gatecard .v{font-size:14px}
+.m-list{list-style:none;margin:0;padding:0;display:grid}
+.m-list > li{display:grid;gap:4px;border-top:1px solid var(--line)}
+.m-row{display:grid;gap:4px;width:100%;min-width:0;min-height:44px;padding:10px 0 9px;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+.m-row:hover .tx{color:var(--holo-hi)}
+.m-row .top{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
+.m-row .id{color:var(--ink-2);letter-spacing:.06em}
+.m-row .tx{font-size:14.5px;overflow-wrap:anywhere}
+.m-row .meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);overflow-wrap:anywhere}
+.m-row.warn .meta{color:var(--amber)}
+.m-row.closed{opacity:.6}
+.tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+.tag.pass,.tag.green{color:var(--ok);border-color:rgba(92,242,176,.55)}
+.tag.fail,.tag.red{color:var(--alert);border-color:rgba(255,107,107,.6)}
+.tag.amber,.tag.warn{color:var(--amber);border-color:rgba(255,181,71,.6)}
+.tag.data{color:var(--plan);border-color:rgba(179,191,255,.55)}
+.m-addback{justify-self:start;margin-bottom:8px}
+.m-bar{display:block;height:6px;background:rgba(79,216,255,.12);overflow:hidden}
+.m-bar i{display:block;height:100%;background:var(--holo)}
+.m-bar.green i{background:var(--ok)}
+.m-bar.amber i{background:var(--amber)}
+.m-bar.red i{background:var(--alert)}
+.m-addback-meter{display:grid;gap:6px}
+.m-heatwrap{display:grid;gap:6px;max-width:340px}
+.m-heat{display:grid;grid-template-columns:18px repeat(5,minmax(0,1fr));gap:3px}
+.m-heat .ax{display:grid;place-items:center;font-family:var(--font-mono);font-size:10px;color:var(--ink-3)}
+.m-heat .hc{height:34px;display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--void)}
+.hc.green{background:rgba(92,242,176,.14)}
+.hc.amber{background:rgba(255,181,71,.16)}
+.hc.red{background:rgba(255,107,107,.18)}
+.hc.green.has{background:var(--ok)}
+.hc.amber.has{background:var(--amber)}
+.hc.red.has{background:var(--alert)}
+.m-form{padding:14px;border:1px solid var(--holo);background:rgba(0,0,0,.25);scroll-margin-top:16px}
+.m-ticks{border:0;margin:0;padding:0;display:grid;gap:0;min-width:0}
+.m-ticks legend{padding:0;margin-bottom:4px;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.form .m-ticks label.check{align-items:flex-start;font-size:13.5px;padding:6px 0;min-height:36px}
+.form .m-ticks label.check input{flex:none;margin-top:1px}
+.m-gatepanel{display:grid;gap:10px;border-color:var(--tc,var(--line-2));scroll-margin-top:16px}
+.m-checks{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.m-checks li{display:flex;gap:8px;align-items:baseline;font-size:14px;color:var(--ink-2)}
+.m-checks .g{flex:none;width:14px;font-family:var(--font-mono)}
+.m-checks li.ok .g{color:var(--ok)}
+.m-checks li.bad{color:var(--ink)}
+.m-checks li.bad .g{color:var(--alert)}
+.m-copy{display:grid;gap:8px}
+.m-copy textarea{font-family:var(--font-mono)}
+.c-preview{display:grid;gap:12px}
+.c-item{display:grid;gap:6px;padding:12px;border:1px solid var(--line-2)}
+.c-item strong{font-family:var(--font-display);font-size:17px;letter-spacing:.04em}
+.tier-hint{margin-top:-6px}
+
 /* One-time boot sweep (decorative; page is complete without it) */
 .sweep{position:fixed;left:0;right:0;top:0;height:2px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,var(--holo),transparent);
   box-shadow:0 0 18px var(--holo);opacity:0;animation:sweep 1.6s ease-out .15s 1}
@@ -494,8 +623,9 @@ body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;
     <div class="section-head">
       <div class="titles"><div class="eyebrow">Registry</div><h2 id="board-title">Projects</h2></div>
       <div class="board-tools">
-        <div class="filters" id="filters" aria-label="Filter by status"></div>
+        <div class="filters" id="filters" aria-label="Filter by status or tier"></div>
         <span class="ro-badge" id="ro-badge" hidden>View only</span>
+        <button class="btn" id="card-btn" type="button" aria-haspopup="dialog">Import card</button>
         <button class="btn" id="add-btn" type="button">Add project</button>
       </div>
     </div>
@@ -533,12 +663,19 @@ body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;
         <option value="done">Done</option>
       </select></label>
     </div>
+    <label for="f-tier">Project type <small>Lean SE tier: sets the gates and paperwork</small><select id="f-tier">
+      <option value="">Plain project</option>
+      <option value="weekend">Weekend · small</option>
+      <option value="blackswan">Black Swan · medium</option>
+      <option value="nasa">NASA · large</option>
+    </select></label>
+    <p class="hint tier-hint" id="f-tier-hint"></p>
     <label for="f-org">Where / with whom<input id="f-org" type="text" maxlength="90" placeholder="ERAU · lab, team or client"></label>
     <label for="f-mission">Mission<textarea id="f-mission" rows="2" maxlength="320"></textarea></label>
     <label for="f-next">Next action<textarea id="f-next" rows="2" maxlength="220" placeholder="The very next concrete step"></textarea></label>
     <div class="row2">
       <label for="f-due">Due date<input id="f-due" type="date"></label>
-      <label for="f-progress">Progress % <small>blank = not tracked</small><input id="f-progress" type="number" min="0" max="100" step="5" placeholder="Not tracked"></label>
+      <label for="f-progress" id="f-progress-wrap">Progress % <small>blank = not tracked</small><input id="f-progress" type="number" min="0" max="100" step="5" placeholder="Not tracked"></label>
     </div>
     <label for="f-systems">Components <small>one per line</small><textarea id="f-systems" rows="4"></textarea></label>
     <label for="f-flags">Flags <small>one per line, things that need attention</small><textarea id="f-flags" rows="3"></textarea></label>
@@ -630,6 +767,9 @@ const STATUS = {
 };
 const STATUS_ORDER = ["active", "watch", "planning", "parked", "done"];
 const isLive = p => p.status !== "parked" && p.status !== "done";
+// The owner's own flags plus the alerts a tiered project raises from its own evidence.
+const allFlags = p => p.flags.concat(p.alerts || []);
+const SE = window.DeckSE || null, SEUI = window.DeckSEUI || null;
 
 const local = {
   get(k, d) { try { const v = localStorage.getItem("deck." + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -678,6 +818,10 @@ function normalize(id, d) {
   p.progress = (typeof p.progress === "number" && isFinite(p.progress)) ? Math.max(0, Math.min(100, p.progress)) : null;
   p.notes = p.notes ? String(p.notes) : "";
   p.order = typeof p.order === "number" ? p.order : 99;
+  // Tiered projects (Lean SE): progress is computed from checklists and gates, never typed.
+  p.tier = SE && SE.isTier(p.tier) ? p.tier : null;
+  if (p.tier) { p.se = SE.cleanSE(p.se); p.progress = SE.progress(p); p.alerts = SE.alerts(p); }
+  else p.alerts = [];
   return p;
 }
 function sorted(list) {
@@ -724,9 +868,9 @@ function renderTelemetry() {
   const active = projects.filter(p => p.status === "active").length;
   $("#t-active").textContent = String(active);
   $("#t-active-sub").textContent = "of " + projects.length + " in the registry";
-  const flags = live.reduce((n, p) => n + p.flags.length, 0);
+  const flags = live.reduce((n, p) => n + allFlags(p).length, 0);
   $("#t-flags").textContent = String(flags);
-  $("#t-flags-sub").textContent = flags ? "across " + live.filter(p => p.flags.length).length + " projects" : "nothing flagged";
+  $("#t-flags-sub").textContent = flags ? "across " + live.filter(p => allFlags(p).length).length + " projects" : "nothing flagged";
   const withNext = live.filter(p => p.next.trim()).length;
   $("#t-next").textContent = withNext + "/" + live.length;
   $("#t-next-sub").textContent = "live projects with a next step";
@@ -737,17 +881,20 @@ function renderFilters() {
   box.textContent = "";
   const counts = { all: projects.length };
   STATUS_ORDER.forEach(s => counts[s] = projects.filter(p => p.status === s).length);
-  ["all"].concat(STATUS_ORDER).forEach(key => {
+  const tierKeys = SE ? SE.TIER_ORDER.map(t => "tier:" + t) : [];
+  tierKeys.forEach(k => counts[k] = projects.filter(p => "tier:" + p.tier === k).length);
+  ["all"].concat(STATUS_ORDER, tierKeys).forEach(key => {
     if (key !== "all" && !counts[key] && filter !== key) return;
     const b = el("button", "filter");
     b.type = "button";
     b.setAttribute("aria-pressed", String(filter === key));
-    b.append(key === "all" ? "All" : STATUS[key].label);
+    b.append(key === "all" ? "All" : STATUS[key] ? STATUS[key].label : SE.TIERS[key.slice(5)].label);
     b.append(el("span", "n", String(counts[key])));
     b.addEventListener("click", () => { filter = key; render(); });
     box.append(b);
   });
 }
+const inFilter = p => filter === "all" || p.status === filter || "tier:" + p.tier === filter;
 
 function renderGrid() {
   const grid = $("#grid");
@@ -758,11 +905,11 @@ function renderGrid() {
     s.append(el("span", null, db === false ? "This browser is blocking storage, so the board can't load. Turn off Private Browsing and reopen the app." : "Your projects load here in a moment."));
     grid.append(s); return;
   }
-  const list = sorted(projects.filter(p => filter === "all" || p.status === filter));
+  const list = sorted(projects.filter(inFilter));
   if (!list.length) {
     const s = el("div", "grid-state");
     s.append(el("strong", null, projects.length ? "Nothing in this filter" : "Registry is empty"));
-    s.append(el("span", null, projects.length ? "Pick another status above." : "Add your first project, or import a backup from Settings."));
+    s.append(el("span", null, projects.length ? "Pick another filter above." : "Add your first project, or import a backup from Settings."));
     if (!projects.length && canWrite !== false && db) { const b = el("button", "btn primary", "Add project"); b.type = "button"; b.addEventListener("click", () => openEditor(null)); s.append(b); }
     grid.append(s); return;
   }
@@ -773,16 +920,20 @@ function card(p) {
   const c = el("article", "card");
   c.dataset.status = p.status;
   c.tabIndex = 0;
-  c.setAttribute("aria-label", p.name + ", " + STATUS[p.status].label);
+  const tiered = !!(p.tier && SEUI);
+  if (tiered) c.dataset.tier = p.tier;
+  c.setAttribute("aria-label", p.name + ", " + STATUS[p.status].label + (tiered ? ", " + SE.TIERS[p.tier].label + " project, phase " + p.se.phase : ""));
 
   const head = el("div", "card-head");
   head.append(el("span", "card-cat", p.category || "Project"));
-  head.append(el("span", "pill", STATUS[p.status].label));
+  if (tiered) { const tags = el("span", "tags"); tags.append(SEUI.tierBadge(p.tier), el("span", "pill", STATUS[p.status].label)); head.append(tags); }
+  else head.append(el("span", "pill", STATUS[p.status].label));
   c.append(head);
 
   c.append(el("h3", "card-title", p.name));
   if (p.org) c.append(el("p", "card-org", p.org));
   if (p.mission) c.append(el("p", "card-mission", p.mission));
+  if (tiered) c.append(SEUI.cardBlock(p));
 
   if (p.components.length) {
     const ul = el("ul", "card-systems");
@@ -790,8 +941,9 @@ function card(p) {
     if (p.components.length > 4) ul.append(el("li", "more", "+" + (p.components.length - 4) + " more"));
     c.append(ul);
   }
-  p.flags.slice(0, 2).forEach(f => c.append(el("div", "flag", f)));
-  if (p.flags.length > 2) c.append(el("div", "flag", "+" + (p.flags.length - 2) + " more flags"));
+  const fl = allFlags(p);
+  fl.slice(0, 2).forEach(f => c.append(el("div", "flag", f)));
+  if (fl.length > 2) c.append(el("div", "flag", "+" + (fl.length - 2) + " more flags"));
 
   if (isLive(p)) {
     const nx = el("div", "card-next");
@@ -831,7 +983,7 @@ function card(p) {
   foot.append(acts);
   c.append(foot);
 
-  const primary = () => (canWrite !== false && db) ? openEditor(p.id) : briefProject(p);
+  const primary = () => tiered ? SEUI.open(p.id) : (canWrite !== false && db) ? openEditor(p.id) : briefProject(p);
   c.addEventListener("click", primary);
   c.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target === c) { e.preventDefault(); primary(); } });
   return c;
@@ -1443,11 +1595,12 @@ function buildBriefing() {
     out.push(x.d === 0 ? x.p.name + " is due today." : x.d === 1 ? x.p.name + " is tomorrow." :
       x.p.name + " is " + x.d + " days out" + (x.d >= 14 ? ", about " + Math.round(x.d / 7) + " weeks" : "") + ".");
   }
-  const flagged = live.filter(p => p.flags.length);
+  if (SEUI) live.filter(p => p.tier).slice(0, 3).forEach(p => out.push(SEUI.phaseLine(p)));
+  const flagged = live.filter(p => allFlags(p).length);
   if (flagged.length) {
-    const n = flagged.reduce((k, p) => k + p.flags.length, 0);
+    const n = flagged.reduce((k, p) => k + allFlags(p).length, 0);
     out.push(plural(n, "flag needs", "flags need") + " your attention.");
-    flagged.slice(0, 2).forEach(p => out.push("On " + p.name + ": " + trimDot(p.flags[0]) + "."));
+    flagged.slice(0, 2).forEach(p => out.push("On " + p.name + ": " + trimDot(allFlags(p)[0]) + "."));
   }
   if (checkLoaded && checklist.length) {
     const st = checkStats();
@@ -1470,8 +1623,9 @@ function briefProject(p) {
   const out = [p.name + ". Status: " + STATUS[p.status].label.toLowerCase() + "."];
   if (p.mission) out.push(trimDot(p.mission) + ".");
   if (p.due) out.push(d < 0 ? "It's " + plural(-d, "day", "days") + " past due." : d === 0 ? "It's due today." : "Due in " + plural(d, "day", "days") + ", on " + fmtShort(p.due) + ".");
+  if (p.tier && SEUI) out.push(SEUI.phaseLine(p).slice(p.name.length + 1).replace(/^is/, "It's"));
   if (p.progress != null) out.push("Progress is at " + Math.round(p.progress) + " percent.");
-  p.flags.slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
+  allFlags(p).slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
   if (isLive(p)) out.push(p.next.trim() ? "Next action: " + trimDot(p.next) + "." : "No next action logged yet.");
   sayBegin(); sayPush(out.join(" ")); sayEnd();
 }
@@ -1515,7 +1669,8 @@ function registrySnapshot() {
     id: p.id, name: p.name, category: p.category || "", where: p.org || "", status: p.status,
     mission: p.mission || "", components: p.components, flags: p.flags, next_action: p.next || "",
     due: p.due || "", days_until_due: p.due ? daysUntil(p.due) : null,
-    progress_percent: p.progress, notes: (p.notes || "").slice(-600)
+    progress_percent: p.progress, notes: (p.notes || "").slice(-600),
+    lean_se: p.tier && SEUI ? SEUI.snapshot(p) : null
   }));
 }
 function rules(withTools) {
@@ -1524,6 +1679,7 @@ function rules(withTools) {
     "You are " + nm + ", the voice assistant built into " + cs + "'s personal project command deck. Personality: a calm, sharp AI copilot with warmth and a light, dry wit. Confident and direct, never gushing, never sycophantic.",
     "Your replies are read aloud by text-to-speech and shown as captions, so write plain spoken sentences only: no markdown, lists, bullet symbols, headings, emoji or links. Keep it to one to four sentences unless he asks for a plan or summary, and even then stay under 120 words. Say numbers and dates the way a person would say them.",
     "Ground every claim in the project registry, checklist and daily log entries that come with each message. If something isn't there, say you don't have that yet and suggest he add it. Never invent deadlines, progress, results or people.",
+    "Projects with a lean_se block are run on his Lean Systems Engineering framework: NASA's phases 0 to 5 with gates (MCR, SRR, PDR, CDR/TRR, ORR/FRR), and Musk's five steps inside each phase (question requirements, delete, simplify, speed up, automate, in that order). The tier sets the rigor: Weekend (small, gates G1 and G4 only), Black Swan (medium, all five gates, lightweight) or NASA (large, full reviews with external reviewers). When he asks about one, give the phase, the next gate, the unmet checks and the alerts. You can't pass gates or tick its checklists; he does that in the project's dashboard.",
     withTools
       ? "You can change project cards with the update_project tool and the checklist with the update_checklist tool. Use them only when he clearly asks you to change, set, mark, add, check off, log or note something. After a change, confirm in one sentence what you changed."
       : "You can't change the deck from here. If he asks you to, tell him to use the card's Edit button or the checklist directly.",
@@ -1675,8 +1831,8 @@ function attentionLines() {
   const live = projects.filter(isLive), out = [];
   const dated = live.filter(p => p.due).map(p => ({ p, d: daysUntil(p.due) })).sort((a, b) => a.d - b.d);
   dated.filter(x => x.d <= 14).forEach(x => out.push(dueLine(x.p)));
-  live.filter(p => p.status === "watch").forEach(p => out.push(p.name + " is on watch" + (p.flags[0] ? ": " + trimDot(p.flags[0]) : "") + "."));
-  live.filter(p => p.status !== "watch" && p.flags.length).slice(0, 3).forEach(p => out.push("Flag on " + p.name + ": " + trimDot(p.flags[0]) + "."));
+  live.filter(p => p.status === "watch").forEach(p => out.push(p.name + " is on watch" + (allFlags(p)[0] ? ": " + trimDot(allFlags(p)[0]) : "") + "."));
+  live.filter(p => p.status !== "watch" && allFlags(p).length).slice(0, 3).forEach(p => out.push("Flag on " + p.name + ": " + trimDot(allFlags(p)[0]) + "."));
   if (checkLoaded) {
     const st = checkStats();
     if (st.openDaily.length) out.push("Today's routine still has " + st.openDaily.slice(0, 3).map(i => trimDot(i.text)).join(", ") + ".");
@@ -1725,18 +1881,23 @@ async function answerOffline(q, quiet) {
   if (/\b(attention|urgent|this week|priorit|what.*(today|next|now))/.test(t) && !p) out = attentionLines();
   else if (p) {
     out.push(p.name + " is " + (p.status === "watch" ? "on watch" : STATUS[p.status].label.toLowerCase()) + ".");
+    if (p.tier && SEUI) out.push(SEUI.phaseLine(p).slice(p.name.length + 1).replace(/^is/, "It's"));
     if (p.due) out.push(dueLine(p));
     if (p.progress != null) out.push("Progress is at " + Math.round(p.progress) + " percent.");
-    p.flags.slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
+    allFlags(p).slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
     if (isLive(p)) out.push(p.next.trim() ? "Focus next on " + trimDot(p.next) + "." : "No next action logged yet.");
   }
   else if (/\b(deadline|due|horizon|coming up|calendar)\b/.test(t)) {
     const dated = projects.filter(x => isLive(x) && x.due).sort((a, b) => daysUntil(a.due) - daysUntil(b.due));
     out = dated.length ? dated.slice(0, 3).map(dueLine) : ["No dates on the board yet."];
   }
+  else if (/\b(gate|gates|phase|phases|review|tier)\b/.test(t) && SEUI) {
+    const tp = projects.filter(x => isLive(x) && x.tier);
+    out = tp.length ? tp.slice(0, 4).map(SEUI.phaseLine) : ["No project has a tier yet. Pick Weekend, Black Swan or NASA in a project's Edit form."];
+  }
   else if (/\b(flag|flags|risk|blocker)/.test(t)) {
-    const fl = projects.filter(isLive).filter(x => x.flags.length);
-    out = fl.length ? fl.slice(0, 4).map(x => x.name + ": " + trimDot(x.flags[0]) + ".") : ["Nothing flagged."];
+    const fl = projects.filter(isLive).filter(x => allFlags(x).length);
+    out = fl.length ? fl.slice(0, 4).map(x => x.name + ": " + trimDot(allFlags(x)[0]) + ".") : ["Nothing flagged."];
   }
   else if (/\b(checklist|to-?do|routine|list)\b/.test(t)) {
     const st = checkStats();
@@ -1800,11 +1961,19 @@ function openEditor(id) {
   $("#f-systems").value = p ? p.components.join("\n") : "";
   $("#f-flags").value = p ? p.flags.join("\n") : "";
   $("#f-notes").value = p ? p.notes : "";
+  $("#f-tier").value = p && p.tier ? p.tier : "";
+  syncTierHint();
   $("#f-delete").hidden = !p;
   $("#delete-confirm").hidden = true;
   $("#save-msg").textContent = ""; $("#save-msg").classList.remove("bad");
   openDrawer($("#edit-drawer"));
 }
+function syncTierHint() {
+  const t = SE && SE.TIERS[$("#f-tier").value];
+  $("#f-tier-hint").textContent = t ? t.scale + " · " + t.fits + ". Gates " + t.gates.join(", ") + ". " + t.docs + ". Progress is computed from its checklists and gates." : "Pick a tier to give this project a mission dashboard with phases, gates and the framework's metrics.";
+  $("#f-progress-wrap").hidden = !!t;
+}
+$("#f-tier").addEventListener("change", syncTierHint);
 function lines(v) { return String(v || "").split("\n").map(s => s.trim()).filter(Boolean).slice(0, 20); }
 function slug(s) { return (String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project") + "-" + Math.random().toString(36).slice(2, 6); }
 $("#edit-form").addEventListener("submit", async e => {
@@ -1826,15 +1995,23 @@ $("#edit-form").addEventListener("submit", async e => {
     notes: $("#f-notes").value,
     updatedAt: new Date().toISOString()
   };
+  // Tier: keep any SE data already on the project, so switching tiers (or back to plain) loses nothing.
+  const tier = SE && SE.isTier($("#f-tier").value) ? $("#f-tier").value : null;
+  const before = editing ? projects.find(x => x.id === editing) : null;
+  data.tier = tier;
+  if (tier) { delete data.progress; if (!before || !before.se) data.se = SE.blank(); }
   $("#f-save").disabled = true; msg.textContent = "Saving…"; msg.classList.remove("bad");
+  let newId = null;
   try {
     if (editing) await db.doc("projects/" + editing).update(data);
     else {
-      data.order = projects.reduce((m, p) => Math.max(m, p.order < 99 ? p.order : 0), 0) + 1;
-      await db.collection("projects").doc(slug(data.name)).set(data);
+      data.order = nextOrder();
+      newId = slug(data.name);
+      await db.collection("projects").doc(newId).set(data);
     }
     msg.textContent = "Saved";
-    setTimeout(closeDrawers, 350);
+    const openId = tier && SEUI ? (editing || newId) : null;
+    setTimeout(() => { closeDrawers(); if (openId) SEUI.open(openId); }, 350);
   } catch (err) {
     msg.classList.add("bad");
     if (err && err.code === "invalid_argument") { msg.textContent = "You can view this deck but not change it."; canWrite = false; render(); }
@@ -1849,6 +2026,7 @@ $("#f-delete-yes").addEventListener("click", async () => {
   try { await db.doc("projects/" + editing).delete(); closeDrawers(); }
   catch (err) { const m = $("#save-msg"); m.classList.add("bad"); m.textContent = "Didn't delete. Try again."; }
 });
+function nextOrder() { return projects.reduce((m, p) => Math.max(m, p.order < 99 ? p.order : 0), 0) + 1; }
 $("#add-btn").addEventListener("click", () => openEditor(null));
 
 /* ---------- settings drawer ---------- */
@@ -1871,6 +2049,15 @@ $("#s-test").addEventListener("click", () => {
   sayBegin(); sayPush((settings.name || "ASTRA") + " online. All systems nominal, " + (settings.callsign || "boss") + ". Say the word and I'll run the board."); sayEnd();
 });
 
+/* ---------- tiered project dashboards (js/se-ui.js) ---------- */
+if (SEUI) {
+  SEUI.mount({
+    el, isoToday, fmtShort, slug, nextOrder, writeDoc, openDrawer, closeDrawers, openEditor,
+    getDB: () => db || null, getProjects: () => projects
+  });
+  $("#card-btn").addEventListener("click", () => SEUI.openImport());
+} else $("#card-btn").hidden = true;
+
 /* ---------- on-device registry (replaces the claude.ai database) ---------- */
 setState("standby");
 (() => {
@@ -1882,6 +2069,7 @@ setState("standby");
     projects = snap.docs.map(d => normalize(d.id, d.data()));
     loaded = true;
     render();
+    if (SEUI) SEUI.refresh();
   }, err => {
     if (!loaded) { loaded = true; projects = []; render(); }
   });

@@ -15,3 +15,8 @@ What was removed from the Command Deck when it was turned into an iPhone app, an
 | 2026-11-19 | Regex lookbehind in the sentence splitter for speech | `index.html` `sayPush` | Older iPhone Safari versions throw on lookbehind | A split on a placeholder character |
 | 2026-11-19 | The "Voice settings" button and drawer title | `index.html` | The drawer now holds the AI link and data tools too | "Settings", with the eyebrow "Assistant · AI link · Data" |
 | 2026-11-19 | The path that disabled Ask when no sampler was available (`disableAsk` is now unused) | `index.html` script | Ask now always works, offline when there's no key | Offline answer engine |
+| 2026-11-19 | The aria-label "Filter by status" on the filter row | `index.html` board | The row now filters by tier too | "Filter by status or tier" |
+| 2026-11-19 | "Pick another status above." in the empty-filter message | `index.html` `renderGrid` | Filters now include tiers | "Pick another filter above." |
+| 2026-11-19 | Tapping a tiered project's card opens the editor | `index.html` `card()` | A tiered card's main view is its mission dashboard; the editor is one tap away on Edit | Tap opens the mission dashboard (plain projects unchanged) |
+| 2026-11-19 | The typed Progress % field, for tiered projects only | `index.html` editor | Two sources of truth: a typed number and the checklists would disagree (R21) | Progress computed from checklists and gates; the field still shows for plain projects |
+| 2026-11-19 | The inline "next order" sum in the editor's save | `index.html` editor submit | The import drawer needs the same number | `nextOrder()`, shared by the editor and status-card import |
