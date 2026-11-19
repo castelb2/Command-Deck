@@ -1,0 +1,1723 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bryaninho Command Deck</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one holographic bridge. Voice core + comms up top, the project registry grid below, a dated horizon track last.
+   Deliberately single-theme (a dark HUD), so every color is set explicitly here. */
+:root{
+  color-scheme: dark;
+  --void:#03080E;
+  --deck:#06111C;
+  --glass:rgba(79,216,255,.04);
+  --glass-2:rgba(79,216,255,.085);
+  --grid:rgba(79,216,255,.05);
+  --line:rgba(79,216,255,.2);
+  --line-2:rgba(79,216,255,.48);
+  --holo:#4FD8FF;
+  --holo-hi:#8BE7FF;
+  --ink:#DDF5FF;
+  --ink-2:#97B9CA;
+  --ink-3:#6E90A2;
+  --amber:#FFB547;
+  --alert:#FF6B6B;
+  --ok:#5CF2B0;
+  --plan:#B3BFFF;
+  --parked:#7A909C;
+  --scrim:rgba(1,5,9,.68);
+  --font-display:"Chakra Petch","Rajdhani","Segoe UI",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans Condensed","Arial Narrow","Segoe UI",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+html{background:var(--void)}
+body{background:var(--void);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Atmosphere: faint blueprint grid, radial glow, scanlines */
+.atmo{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1200px 600px at 30% -10%, rgba(79,216,255,.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(179,191,255,.06), transparent 60%),
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0/48px 48px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/48px 48px;
+}
+.atmo::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom, rgba(79,216,255,.022) 0 1px, transparent 1px 3px)}
+
+.shell{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding-block:20px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid;gap:22px}
+
+/* Type */
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--holo)}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;margin:0;text-wrap:balance}
+h1{font-size:28px;letter-spacing:.08em;text-transform:uppercase;line-height:1.1}
+h2{font-size:20px;letter-spacing:.06em;text-transform:uppercase}
+.mono{font-family:var(--font-mono)}
+
+/* Buttons */
+.btn{font-family:var(--font-display);font-weight:600;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+  padding:9px 14px;border:1px solid var(--line-2);background:transparent;color:var(--holo);cursor:pointer;line-height:1.2;
+  transition:background .15s, border-color .15s, color .15s}
+.btn:hover{background:rgba(79,216,255,.1);border-color:var(--holo)}
+.btn.primary{background:var(--holo);color:var(--void);border-color:var(--holo)}
+.btn.primary:hover{background:var(--holo-hi);border-color:var(--holo-hi)}
+.btn.ghost{border-color:transparent}
+.btn.ghost:hover{border-color:var(--line-2)}
+.btn.danger{color:var(--alert);border-color:rgba(255,107,107,.5)}
+.btn.danger:hover{background:rgba(255,107,107,.12);border-color:var(--alert)}
+.btn.sm{padding:6px 10px;font-size:11px}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn:disabled:hover{background:transparent;border-color:var(--line-2)}
+.btn.primary:disabled:hover{background:var(--holo)}
+:focus-visible{outline:2px solid var(--holo);outline-offset:2px}
+
+/* Panels with HUD corner brackets */
+.panel{position:relative;background:linear-gradient(180deg,var(--glass-2),var(--glass) 45%);border:1px solid var(--line);padding:16px;min-width:0}
+.panel::before,.panel::after,.card::before,.card::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;border-style:solid;border-color:var(--st, var(--holo))}
+.panel::before,.card::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.panel::after,.card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.panel-label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:14px}
+.panel-label > span:last-child{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+/* Top bar */
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{width:30px;height:30px;position:relative;flex:none}
+.brand-mark::before{content:"";position:absolute;inset:3px;border:1.5px solid var(--holo);transform:rotate(45deg);animation:spin 14s linear infinite}
+.brand-mark::after{content:"";position:absolute;inset:11px;background:var(--holo);box-shadow:0 0 12px var(--holo);transform:rotate(45deg)}
+@keyframes spin{to{transform:rotate(405deg)}}
+.topbar-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.clock{display:grid;text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums;line-height:1.25}
+.clock #clock-time{font-size:17px;color:var(--ink);letter-spacing:.06em}
+.clock #clock-date{font-size:11px;color:var(--ink-3);letter-spacing:.14em;text-transform:uppercase}
+.chip{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--line-2);color:var(--ink-2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.chip[data-state="speaking"]{color:var(--holo);border-color:var(--holo)}
+.chip[data-state="speaking"]::before{background:var(--holo);box-shadow:0 0 8px var(--holo);animation:blink 1s ease-in-out infinite}
+.chip[data-state="thinking"]{color:var(--plan);border-color:var(--plan)}
+.chip[data-state="thinking"]::before{background:var(--plan);animation:blink .6s ease-in-out infinite}
+.chip[data-state="ready"]::before{background:var(--ok)}
+@keyframes blink{50%{opacity:.25}}
+
+/* Bridge */
+.bridge{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:18px;align-items:start}
+.core-panel{display:grid;gap:14px}
+.core-wrap{position:relative;display:grid;place-items:center;width:100%;max-width:340px;margin:0 auto;aspect-ratio:1/1}
+#core{display:block;width:100%;height:100%;max-width:100%}
+.core-center{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.core-name{font-family:var(--font-display);font-weight:700;font-size:26px;letter-spacing:.32em;padding-left:.32em;color:var(--ink);text-shadow:0 0 18px rgba(79,216,255,.55)}
+.core-state{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--holo)}
+.core-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.caption{margin:0;min-height:4.5em;max-height:190px;overflow:auto;font-size:16px;line-height:1.5;color:var(--ink);
+  padding:10px 12px;background:rgba(0,0,0,.28);border:1px solid var(--line)}
+.caption .who{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;color:var(--plan);text-transform:uppercase;margin-right:8px}
+.caption .muted{color:var(--ink-2)}
+
+.comms{display:grid;gap:18px;min-width:0}
+.telemetry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tele{position:relative;padding:12px 14px 13px;background:var(--glass);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line);min-width:0}
+.tele-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.tele-value{font-family:var(--font-display);font-weight:600;font-size:36px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--ink);margin-top:4px}
+.tele-sub{font-size:13px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tele.hot .tele-value{color:var(--amber);text-shadow:0 0 18px rgba(255,181,71,.35)}
+.tele.hot{border-top-color:var(--amber)}
+
+.ask-panel{display:grid;gap:12px}
+.transcript{display:grid;gap:10px;max-height:260px;overflow:auto;padding-right:4px;align-content:start}
+.transcript .empty-line{color:var(--ink-3);font-size:14px}
+.turn{display:grid;gap:2px;min-width:0}
+.turn .who{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.turn.ai .who{color:var(--plan)}
+.turn .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.turn.you .txt{color:var(--ink-2)}
+.turn.sys .txt{font-family:var(--font-mono);font-size:12.5px;color:var(--ok)}
+.turn.err .txt{color:var(--amber)}
+.ask{display:flex;gap:8px}
+.ask input{flex:1;min-width:0}
+input[type="text"],input[type="date"],input[type="number"],select,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line-2);color:var(--ink);padding:10px 12px;border-radius:0;font-size:15px;width:100%;box-sizing:border-box}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--holo);box-shadow:0 0 0 3px rgba(79,216,255,.15)}
+textarea{resize:vertical;line-height:1.45}
+.prompts{display:flex;flex-wrap:wrap;gap:8px}
+.prompt{font-size:13px;padding:6px 10px;border:1px dashed var(--line-2);background:transparent;color:var(--ink-2);cursor:pointer;text-align:left}
+.prompt:hover{color:var(--ink);border-color:var(--holo);border-style:solid}
+.ask-note{margin:0;font-size:13px;color:var(--amber)}
+
+/* Board */
+.section-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px;margin-bottom:14px}
+.section-head .titles{display:grid;gap:2px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filter{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);background:transparent;color:var(--ink-2);cursor:pointer}
+.filter .n{color:var(--ink-3);margin-left:6px;font-variant-numeric:tabular-nums}
+.filter[aria-pressed="true"]{border-color:var(--holo);color:var(--holo);background:rgba(79,216,255,.08)}
+.filter[aria-pressed="true"] .n{color:var(--holo)}
+.board-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ro-badge{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px;align-items:start}
+.card{--st:var(--holo);position:relative;display:flex;flex-direction:column;gap:10px;padding:16px 16px 14px;min-width:0;cursor:pointer;
+  background:linear-gradient(180deg,var(--glass-2),var(--glass) 55%);border:1px solid var(--line);transition:border-color .18s, background .18s}
+.card:hover{border-color:var(--line-2);background:linear-gradient(180deg,rgba(79,216,255,.12),var(--glass) 60%)}
+.card[data-status="watch"]{--st:var(--amber)}
+.card[data-status="planning"]{--st:var(--plan)}
+.card[data-status="parked"]{--st:var(--parked);opacity:.78}
+.card[data-status="done"]{--st:var(--ok)}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-cat{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{flex:none;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px 3px 7px;border:1px solid var(--st);color:var(--st);
+  background:rgba(79,216,255,.06);background:color-mix(in srgb, var(--st) 12%, transparent);display:inline-flex;align-items:center;gap:6px}
+.pill::before{content:"";width:6px;height:6px;background:var(--st)}
+.card[data-status="active"] .pill::before{animation:blink 2.4s ease-in-out infinite}
+.card-title{font-size:20px;letter-spacing:.03em;line-height:1.2}
+.card-org{margin:-6px 0 0;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-2)}
+.card-mission{margin:0;color:var(--ink-2);font-size:14.5px}
+.card-systems{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.card-systems li{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);display:flex;gap:8px;align-items:baseline;min-width:0}
+.card-systems li::before{content:"";flex:none;width:5px;height:5px;border:1px solid var(--st);transform:translateY(-1px)}
+.card-systems li.more{color:var(--ink-3)}
+.card-systems li.more::before{border-color:transparent}
+.flag{font-size:13.5px;color:var(--amber);display:flex;gap:8px;align-items:baseline}
+.flag::before{content:"FLAG";flex:none;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;padding:1px 5px;border:1px solid rgba(255,181,71,.6)}
+.card-next{display:grid;gap:2px;padding-top:10px;border-top:1px dashed var(--line)}
+.card-next .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--holo)}
+.card-next .v{font-size:14.5px;color:var(--ink)}
+.card-next .v.unset{color:var(--ink-3)}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:auto}
+.readout{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.readout.soon{color:var(--amber)}
+.readout.over{color:var(--alert)}
+.progress{display:flex;align-items:center;gap:8px}
+.segs{display:grid;grid-template-columns:repeat(10,8px);gap:2px}
+.segs i{height:8px;background:rgba(79,216,255,.12)}
+.segs i.on{background:var(--st);box-shadow:0 0 6px var(--st)}
+.card-actions{display:flex;gap:6px;margin-left:auto}
+.grid-state{grid-column:1/-1;padding:28px 18px;border:1px dashed var(--line-2);color:var(--ink-2);display:grid;gap:12px;justify-items:start}
+.grid-state strong{font-family:var(--font-display);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);font-weight:600}
+.dots::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+/* Today: checklist + daily log */
+.today{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:18px;align-items:start}
+.check-panel{display:grid;gap:12px}
+.check-meter{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,1fr));gap:3px;height:6px}
+.check-meter i{background:rgba(79,216,255,.12)}
+.check-meter i.on{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.check-add{display:flex;gap:8px;align-items:center}
+.check-add input[type="text"]{flex:1;min-width:0}
+.daily-toggle{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;cursor:pointer}
+.daily-toggle input{accent-color:var(--holo);width:16px;height:16px;margin:0}
+.check-head{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--holo);display:flex;gap:8px;align-items:baseline}
+.check-head small{color:var(--ink-3);letter-spacing:.04em;text-transform:none;font-size:11px}
+.check-list{list-style:none;margin:6px 0 0;padding:0;display:grid}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.check-box{flex:none;width:20px;height:20px;border:1.5px solid var(--line-2);background:transparent;cursor:pointer;display:grid;place-items:center;padding:0;margin-top:1px}
+.check-box:hover{border-color:var(--holo)}
+.check-box:disabled{cursor:default}
+.check-box[aria-checked="true"]{border-color:var(--ok);background:rgba(92,242,176,.15)}
+.check-box[aria-checked="true"]::after{content:"";width:10px;height:5px;border-left:2px solid var(--ok);border-bottom:2px solid var(--ok);transform:translateY(-1px) rotate(-45deg)}
+.check-text{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14.5px}
+.check-item.done .check-text{color:var(--ink-3);text-decoration:line-through;text-decoration-color:rgba(110,144,162,.6)}
+.check-tag{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3);text-decoration:none}
+.check-del{flex:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-family:var(--font-mono);font-size:10.5px;padding:3px 4px;letter-spacing:.1em;text-transform:uppercase}
+.check-del:hover,.check-del.arm{color:var(--alert)}
+.check-empty{color:var(--ink-3);font-size:13.5px;padding:8px 0;border-top:1px solid var(--line)}
+.linkish{justify-self:start;background:none;border:0;color:var(--holo);font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:4px 0}
+
+.log-panel{display:grid;gap:14px}
+.log-days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.log-day{flex:none;display:grid;justify-items:center;padding:6px 10px;min-width:52px;border:1px solid var(--line);background:transparent;color:var(--ink-2);cursor:pointer;font-family:var(--font-mono);line-height:1.2}
+.log-day .dw{font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.log-day .dn{font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--ink)}
+.log-day .dm{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.log-day.pending{border-style:dashed}
+.log-day.pending .dn{color:var(--ink-3)}
+.log-day[aria-selected="true"]{border-color:var(--holo);border-style:solid;background:rgba(79,216,255,.1);color:var(--holo)}
+.log-body{display:grid;gap:14px;min-width:0}
+.log-head{display:grid;gap:4px}
+.log-title{font-size:22px;letter-spacing:.03em;line-height:1.2}
+.log-meta{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.log-summary{margin:0;font-size:16px;line-height:1.6;color:var(--ink);max-width:72ch}
+.log-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px 24px}
+.log-block .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--holo)}
+.log-block ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.log-block li{font-size:14.5px;color:var(--ink-2);display:flex;gap:8px;align-items:baseline;min-width:0;overflow-wrap:anywhere}
+.log-block li::before{content:"";flex:none;width:5px;height:5px;border:1px solid var(--holo);transform:translateY(-1px)}
+.log-block a{color:var(--holo);text-decoration:none;border-bottom:1px solid var(--line-2)}
+.log-block a:hover{border-bottom-color:var(--holo)}
+.log-empty{border:1px dashed var(--line-2);padding:16px;color:var(--ink-2);display:grid;gap:6px}
+.log-empty strong{font-family:var(--font-display);font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);font-weight:600}
+.log-notes{display:grid;gap:6px;padding-top:12px;border-top:1px dashed var(--line)}
+.log-notes label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.log-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media (max-width: 860px){ .today{grid-template-columns:minmax(0,1fr)} }
+
+/* Horizon */
+.track-wrap{overflow-x:auto}
+.track{position:relative;height:128px;min-width:520px;margin:0 10px}
+.track-axis{position:absolute;left:0;right:0;top:60px;height:1px;background:var(--line-2)}
+.tick{position:absolute;top:54px;width:1px;height:13px;background:var(--line-2)}
+.tick-label{position:absolute;top:74px;transform:translateX(-50%);font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.tick.today{background:var(--holo);height:21px;top:50px;box-shadow:0 0 8px var(--holo)}
+.tick-label.today{color:var(--holo)}
+.mark{position:absolute;top:54px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:var(--st, var(--holo));box-shadow:0 0 10px var(--st, var(--holo))}
+.mark-label{position:absolute;bottom:calc(100% - 48px);transform:translateX(-50%);font-size:13px;color:var(--ink);white-space:nowrap;display:grid;justify-items:center;line-height:1.2}
+.mark-label small{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.08em}
+.mark-label.lo{bottom:auto;top:94px}
+.horizon-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:0}
+.horizon-list li{display:grid;grid-template-columns:120px 90px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line)}
+.horizon-list .d{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+.horizon-list .t{font-family:var(--font-mono);font-size:12px;color:var(--holo);font-variant-numeric:tabular-nums}
+.horizon-list .t.soon{color:var(--amber)}
+.horizon-list .t.over{color:var(--alert)}
+.horizon-list .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.horizon-empty{color:var(--ink-2);margin:0}
+
+/* Drawers */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:50;width:min(480px,100%);box-sizing:border-box;overflow:auto;background:var(--deck);border-left:1px solid var(--line-2);
+  box-shadow:-30px 0 60px rgba(0,0,0,.5);
+  padding-top:max(20px, calc(env(safe-area-inset-top, 0px) + 12px));padding-bottom:max(24px, env(safe-area-inset-bottom, 0px));
+  padding-left:20px;padding-right:max(20px, env(safe-area-inset-right, 0px))}
+.drawer-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.form{display:grid;gap:14px}
+.form label{display:grid;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.form label small{letter-spacing:.04em;text-transform:none;font-size:11px;color:var(--ink-3)}
+.form .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label.check{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-family:var(--font-body);font-size:14.5px;color:var(--ink)}
+.form label.check input{width:18px;height:18px;accent-color:var(--holo)}
+input[type="range"]{width:100%;accent-color:var(--holo)}
+.drawer-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:6px}
+.drawer-actions .spacer{flex:1}
+.save-msg{font-family:var(--font-mono);font-size:12px;color:var(--ok)}
+.save-msg.bad{color:var(--alert)}
+.confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,107,107,.5);color:var(--ink)}
+.hint{margin:0;font-size:13.5px;color:var(--ink-2)}
+
+/* One-time boot sweep (decorative; page is complete without it) */
+.sweep{position:fixed;left:0;right:0;top:0;height:2px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,var(--holo),transparent);
+  box-shadow:0 0 18px var(--holo);opacity:0;animation:sweep 1.6s ease-out .15s 1}
+@keyframes sweep{0%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(100vh)}}
+
+@media (max-width: 980px){
+  .telemetry{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 860px){
+  .bridge{grid-template-columns:minmax(0,1fr)}
+  .core-wrap{max-width:280px}
+}
+@media (max-width: 520px){
+  h1{font-size:22px}
+  .tele-value{font-size:30px}
+  .form .row2{grid-template-columns:1fr}
+  .horizon-list li{grid-template-columns:96px 70px minmax(0,1fr)}
+  .horizon-list li .s{display:none}
+  .clock{text-align:left}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .sweep{display:none}
+}
+</style>
+
+<div class="atmo" aria-hidden="true"></div>
+<div class="sweep" aria-hidden="true"></div>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <div class="eyebrow">Personal ops grid</div>
+        <h1>Command Deck</h1>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <div class="clock" aria-label="Current time"><span id="clock-time">--:--:--</span><span id="clock-date">—</span></div>
+      <span class="chip" id="voice-chip" data-state="idle">Voice standby</span>
+      <button class="btn" id="open-settings" type="button" aria-haspopup="dialog">Voice settings</button>
+    </div>
+  </header>
+
+  <section class="bridge" aria-label="Assistant">
+    <div class="panel core-panel">
+      <div class="panel-label"><span>Voice core</span><span id="core-voice" title="Current voice">Voice: auto</span></div>
+      <div class="core-wrap" id="core-wrap">
+        <canvas id="core" aria-hidden="true"></canvas>
+        <div class="core-center">
+          <div class="core-name js-ai-name" id="core-name">ASTRA</div>
+          <div class="core-state" id="core-state">Standby</div>
+        </div>
+      </div>
+      <div class="core-actions">
+        <button class="btn primary" id="brief-btn" type="button">Run briefing</button>
+        <button class="btn" id="stop-btn" type="button" disabled>Stop</button>
+      </div>
+      <p class="caption" id="caption" aria-live="polite"><span class="who js-ai-name">ASTRA</span><span class="muted">Standing by. Tap Run briefing and I’ll walk you through the board.</span></p>
+    </div>
+
+    <div class="comms">
+      <div class="telemetry">
+        <div class="tele" id="tele-deadline">
+          <div class="tele-label">Next deadline</div>
+          <div class="tele-value" id="t-dead">—</div>
+          <div class="tele-sub" id="t-dead-sub">No dates set yet</div>
+        </div>
+        <div class="tele">
+          <div class="tele-label">Active</div>
+          <div class="tele-value" id="t-active">—</div>
+          <div class="tele-sub" id="t-active-sub">projects in motion</div>
+        </div>
+        <div class="tele">
+          <div class="tele-label">Open flags</div>
+          <div class="tele-value" id="t-flags">—</div>
+          <div class="tele-sub" id="t-flags-sub">items needing attention</div>
+        </div>
+        <div class="tele">
+          <div class="tele-label">Next actions</div>
+          <div class="tele-value" id="t-next">—</div>
+          <div class="tele-sub" id="t-next-sub">logged on live projects</div>
+        </div>
+      </div>
+
+      <div class="panel ask-panel">
+        <div class="panel-label"><span>Talk to <span class="js-ai-name">ASTRA</span></span><span>Type in · she answers out loud</span></div>
+        <div class="transcript" id="transcript">
+          <div class="empty-line">Ask about any project, or tell her to change something: “Mark the payload as on watch,” “Set the next step for AE 524 to review chapter 6,” or “Add a 2,000-meter swim to my daily routine.”</div>
+        </div>
+        <form class="ask" id="ask-form" autocomplete="off">
+          <label for="ask-input" class="sr">Message your assistant</label>
+          <input id="ask-input" type="text" maxlength="600" placeholder="Ask about a project, or tell her to update one">
+          <button class="btn primary" id="ask-send" type="submit">Send</button>
+        </form>
+        <div class="prompts" id="prompts">
+          <button type="button" class="prompt">What needs my attention this week?</button>
+          <button type="button" class="prompt">How many weeks until race day, and what should I focus on?</button>
+          <button type="button" class="prompt">Pitch my research projects in three sentences for a PhD statement.</button>
+        </div>
+        <p class="ask-note" id="ask-note" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="today" aria-label="Today">
+    <div class="panel check-panel">
+      <div class="panel-label"><span>Checklist</span><span id="check-count">—</span></div>
+      <div class="check-meter" id="check-meter" aria-hidden="true"></div>
+      <form class="check-add" id="check-form" autocomplete="off">
+        <label for="check-input" class="sr">New checklist item</label>
+        <input id="check-input" type="text" maxlength="140" placeholder="Add an item">
+        <label class="daily-toggle" for="check-daily"><input id="check-daily" type="checkbox"> Daily</label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <p class="ask-note" id="check-note" hidden></p>
+      <div class="check-group">
+        <div class="check-head">Daily routine <small>resets at midnight</small></div>
+        <ul class="check-list" id="check-daily-list"></ul>
+      </div>
+      <div class="check-group">
+        <div class="check-head">To-do</div>
+        <ul class="check-list" id="check-todo-list"></ul>
+      </div>
+      <button class="linkish" id="check-show-done" type="button" hidden>Show earlier completed</button>
+    </div>
+
+    <div class="panel log-panel">
+      <div class="panel-label"><span>Daily log</span><span>New entry nightly · 11:59 PM</span></div>
+      <div class="log-days" id="log-days" role="tablist" aria-label="Log entries by day"></div>
+      <div class="log-body" id="log-body" aria-live="polite"></div>
+      <div class="log-notes" id="log-notes-wrap" hidden>
+        <label for="log-notes">Your notes</label>
+        <textarea id="log-notes" rows="3" maxlength="4000" placeholder="Anything you want on the record for this day"></textarea>
+        <div class="log-actions">
+          <button class="btn sm" id="log-read" type="button" hidden>Read aloud</button>
+          <span class="save-msg" id="log-notes-msg" role="status"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="board-title">
+    <div class="section-head">
+      <div class="titles"><div class="eyebrow">Registry</div><h2 id="board-title">Projects</h2></div>
+      <div class="board-tools">
+        <div class="filters" id="filters" aria-label="Filter by status"></div>
+        <span class="ro-badge" id="ro-badge" hidden>View only</span>
+        <button class="btn" id="add-btn" type="button">Add project</button>
+      </div>
+    </div>
+    <div class="grid" id="grid">
+      <div class="grid-state"><strong class="dots">Syncing project registry</strong><span>Your projects load here in a moment.</span></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="horizon-title">
+    <div class="section-head" style="margin-bottom:6px">
+      <div class="titles"><div class="eyebrow">Horizon · next 120 days</div><h2 id="horizon-title">Dated items</h2></div>
+    </div>
+    <div class="track-wrap"><div class="track" id="track" aria-hidden="true"></div></div>
+    <ul class="horizon-list" id="horizon"></ul>
+    <p class="horizon-empty" id="horizon-empty" hidden>No dated items. Give a project a due date and it lands on this track.</p>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="edit-drawer" role="dialog" aria-modal="true" aria-labelledby="edit-title" hidden>
+  <div class="drawer-head">
+    <div><div class="eyebrow" id="edit-eyebrow">Edit project</div><h2 id="edit-title">—</h2></div>
+    <button class="btn ghost" type="button" data-close>Close</button>
+  </div>
+  <form class="form" id="edit-form" autocomplete="off">
+    <label for="f-name">Name<input id="f-name" type="text" required maxlength="80"></label>
+    <div class="row2">
+      <label for="f-cat">Category<input id="f-cat" type="text" maxlength="30" placeholder="Research"></label>
+      <label for="f-status">Status<select id="f-status">
+        <option value="active">Active</option>
+        <option value="watch">Watch</option>
+        <option value="planning">Planning</option>
+        <option value="parked">Parked</option>
+        <option value="done">Done</option>
+      </select></label>
+    </div>
+    <label for="f-org">Where / with whom<input id="f-org" type="text" maxlength="90" placeholder="ERAU · lab, team or client"></label>
+    <label for="f-mission">Mission<textarea id="f-mission" rows="2" maxlength="320"></textarea></label>
+    <label for="f-next">Next action<textarea id="f-next" rows="2" maxlength="220" placeholder="The very next concrete step"></textarea></label>
+    <div class="row2">
+      <label for="f-due">Due date<input id="f-due" type="date"></label>
+      <label for="f-progress">Progress % <small>blank = not tracked</small><input id="f-progress" type="number" min="0" max="100" step="5" placeholder="Not tracked"></label>
+    </div>
+    <label for="f-systems">Components <small>one per line</small><textarea id="f-systems" rows="4"></textarea></label>
+    <label for="f-flags">Flags <small>one per line, things that need attention</small><textarea id="f-flags" rows="3"></textarea></label>
+    <label for="f-notes">Notes<textarea id="f-notes" rows="4" maxlength="4000"></textarea></label>
+    <div class="drawer-actions">
+      <button class="btn primary" type="submit" id="f-save">Save</button>
+      <span class="save-msg" id="save-msg" role="status"></span>
+      <span class="spacer"></span>
+      <button class="btn danger" type="button" id="f-delete">Delete</button>
+    </div>
+    <div class="confirm" id="delete-confirm" hidden>
+      <span>Delete this project for good?</span>
+      <button class="btn danger sm" type="button" id="f-delete-yes">Delete</button>
+      <button class="btn sm" type="button" id="f-delete-no">Keep it</button>
+    </div>
+  </form>
+</aside>
+
+<aside class="drawer" id="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+  <div class="drawer-head">
+    <div><div class="eyebrow">Assistant</div><h2 id="settings-title">Voice settings</h2></div>
+    <button class="btn ghost" type="button" data-close>Close</button>
+  </div>
+  <form class="form" id="settings-form" autocomplete="off">
+    <div class="row2">
+      <label for="s-name">Assistant name<input id="s-name" type="text" maxlength="16"></label>
+      <label for="s-callsign">She calls you<input id="s-callsign" type="text" maxlength="24"></label>
+    </div>
+    <label for="s-voice">Voice<select id="s-voice"></select></label>
+    <p class="hint" id="s-voice-hint"></p>
+    <div class="row2">
+      <label for="s-rate">Rate <small id="s-rate-val"></small><input id="s-rate" type="range" min="0.8" max="1.3" step="0.02"></label>
+      <label for="s-pitch">Pitch <small id="s-pitch-val"></small><input id="s-pitch" type="range" min="0.8" max="1.4" step="0.02"></label>
+    </div>
+    <label class="check" for="s-mute"><input id="s-mute" type="checkbox"> Captions only, no voice</label>
+    <div class="drawer-actions">
+      <button class="btn primary" type="button" id="s-test">Test voice</button>
+    </div>
+    <p class="hint">Voices come from your device and browser, so the list on your laptop and your phone will differ. Natural or Neural voices (Edge and Windows) and Premium or Enhanced voices (Mac and iPhone) sound the smoothest. These settings stay on this device.</p>
+  </form>
+</aside>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- small helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const TAU = Math.PI * 2;
+const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+const STATUS = {
+  active:   { label: "Active" },
+  watch:    { label: "Watch" },
+  planning: { label: "Planning" },
+  parked:   { label: "Parked" },
+  done:     { label: "Done" }
+};
+const STATUS_ORDER = ["active", "watch", "planning", "parked", "done"];
+const isLive = p => p.status !== "parked" && p.status !== "done";
+
+const local = {
+  get(k, d) { try { const v = localStorage.getItem("deck." + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("deck." + k, JSON.stringify(v)); } catch (e) { /* storage unavailable: settings last this visit */ } }
+};
+const settings = {
+  name: local.get("name", "ASTRA"),
+  callsign: local.get("callsign", "Bryaninho"),
+  voiceURI: local.get("voiceURI", ""),
+  rate: local.get("rate", 1.02),
+  pitch: local.get("pitch", 1.08),
+  mute: local.get("mute", false)
+};
+
+/* ---------- dates ---------- */
+function parseISO(d) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ""); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+function todayMid() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function daysUntil(iso) { const d = parseISO(iso); return d ? Math.round((d - todayMid()) / 86400000) : null; }
+function fmtShort(iso) { const d = parseISO(iso); return d ? d.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" }) : ""; }
+function fmtLong(d) { return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }); }
+function isoToday() { const n = new Date(); return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); }
+function trimDot(s) { return String(s || "").trim().replace(/[.\s]+$/, ""); }
+
+/* ---------- state ---------- */
+let projects = [];
+let loaded = false;
+let db = null;
+let canWrite = null;       // null = not told; false = read-only
+let filter = "all";
+let history = [];          // chat turns for the assistant
+let askCtl = null;
+const samplePromise = (window.claude && typeof window.claude.use === "function") ? window.claude.use("sample") : Promise.resolve(null);
+let sampleFn = null, toolsOK = false, sampleChecked = false;
+let checklist = [], checkLoaded = false, logs = [], logLoaded = false, selectedDay = null, showDone = false;
+const writeChain = new Map();
+const core = { cv: $("#core"), ctx: null, size: 0, level: 0.06, kick: 0, state: "standby", t0: performance.now(), raf: 0 };
+
+function normalize(id, d) {
+  const p = Object.assign({}, d || {});
+  p.id = id;
+  p.name = String(p.name || "Untitled project");
+  p.status = STATUS[p.status] ? p.status : "active";
+  p.components = Array.isArray(p.components) ? p.components.map(String) : [];
+  p.flags = Array.isArray(p.flags) ? p.flags.map(String) : [];
+  p.next = p.next ? String(p.next) : "";
+  p.due = parseISO(p.due) ? p.due : null;
+  p.progress = (typeof p.progress === "number" && isFinite(p.progress)) ? Math.max(0, Math.min(100, p.progress)) : null;
+  p.notes = p.notes ? String(p.notes) : "";
+  p.order = typeof p.order === "number" ? p.order : 99;
+  return p;
+}
+function sorted(list) {
+  return list.slice().sort((a, b) => {
+    const sa = STATUS_ORDER.indexOf(a.status), sb = STATUS_ORDER.indexOf(b.status);
+    if (sa !== sb) return sa - sb;
+    const da = daysUntil(a.due), dbb = daysUntil(b.due);
+    if (da !== dbb) { if (da == null) return 1; if (dbb == null) return -1; return da - dbb; }
+    return (a.order - b.order) || a.name.localeCompare(b.name);
+  });
+}
+
+/* ---------- clock ---------- */
+let lastDay = isoToday();
+function tickClock() {
+  const n = new Date();
+  if (isoToday() !== lastDay) { lastDay = isoToday(); render(); }
+  $("#clock-time").textContent = n.toLocaleTimeString("en-US", { hour12: false });
+  $("#clock-date").textContent = n.toLocaleDateString("en-US", { weekday: "short", day: "2-digit", month: "short", year: "numeric" }) + " · " + (Intl.DateTimeFormat().resolvedOptions().timeZone || "local").split("/").pop().replace(/_/g, " ");
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ---------- render ---------- */
+function render() { renderTelemetry(); renderFilters(); renderGrid(); renderHorizon(); renderChecklist(); renderLog(); }
+
+function renderTelemetry() {
+  const live = projects.filter(isLive);
+  const dated = live.filter(p => p.due).map(p => ({ p, d: daysUntil(p.due) })).sort((a, b) => a.d - b.d);
+  const over = dated.filter(x => x.d < 0);
+  const up = dated.filter(x => x.d >= 0);
+  const tile = $("#tele-deadline");
+  if (!loaded) { $("#t-dead").textContent = "—"; }
+  else if (over.length) {
+    $("#t-dead").textContent = "+" + (-over[0].d) + "d"; $("#t-dead-sub").textContent = "Overdue · " + over[0].p.name; tile.classList.add("hot");
+  } else if (up.length) {
+    const x = up[0];
+    $("#t-dead").textContent = "T−" + x.d;
+    $("#t-dead-sub").textContent = x.p.name + " · " + fmtShort(x.p.due);
+    tile.classList.toggle("hot", x.d <= 60);
+  } else { $("#t-dead").textContent = "—"; $("#t-dead-sub").textContent = "No dates set yet"; tile.classList.remove("hot"); }
+
+  if (!loaded) return;
+  const active = projects.filter(p => p.status === "active").length;
+  $("#t-active").textContent = String(active);
+  $("#t-active-sub").textContent = "of " + projects.length + " in the registry";
+  const flags = live.reduce((n, p) => n + p.flags.length, 0);
+  $("#t-flags").textContent = String(flags);
+  $("#t-flags-sub").textContent = flags ? "across " + live.filter(p => p.flags.length).length + " projects" : "nothing flagged";
+  const withNext = live.filter(p => p.next.trim()).length;
+  $("#t-next").textContent = withNext + "/" + live.length;
+  $("#t-next-sub").textContent = "live projects with a next step";
+}
+
+function renderFilters() {
+  const box = $("#filters");
+  box.textContent = "";
+  const counts = { all: projects.length };
+  STATUS_ORDER.forEach(s => counts[s] = projects.filter(p => p.status === s).length);
+  ["all"].concat(STATUS_ORDER).forEach(key => {
+    if (key !== "all" && !counts[key] && filter !== key) return;
+    const b = el("button", "filter");
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(filter === key));
+    b.append(key === "all" ? "All" : STATUS[key].label);
+    b.append(el("span", "n", String(counts[key])));
+    b.addEventListener("click", () => { filter = key; render(); });
+    box.append(b);
+  });
+}
+
+function renderGrid() {
+  const grid = $("#grid");
+  grid.textContent = "";
+  if (!loaded) {
+    const s = el("div", "grid-state");
+    s.append(el("strong", "dots", db === false ? "Registry offline" : "Syncing project registry"));
+    s.append(el("span", null, db === false ? "Your projects are stored with this page on claude.ai. Open it while signed in to load them." : "Your projects load here in a moment."));
+    grid.append(s); return;
+  }
+  const list = sorted(projects.filter(p => filter === "all" || p.status === filter));
+  if (!list.length) {
+    const s = el("div", "grid-state");
+    s.append(el("strong", null, projects.length ? "Nothing in this filter" : "Registry is empty"));
+    s.append(el("span", null, projects.length ? "Pick another status above." : "Add your first project and your assistant starts tracking it."));
+    if (!projects.length && canWrite !== false && db) { const b = el("button", "btn primary", "Add project"); b.type = "button"; b.addEventListener("click", () => openEditor(null)); s.append(b); }
+    grid.append(s); return;
+  }
+  list.forEach(p => grid.append(card(p)));
+}
+
+function card(p) {
+  const c = el("article", "card");
+  c.dataset.status = p.status;
+  c.tabIndex = 0;
+  c.setAttribute("aria-label", p.name + ", " + STATUS[p.status].label);
+
+  const head = el("div", "card-head");
+  head.append(el("span", "card-cat", p.category || "Project"));
+  head.append(el("span", "pill", STATUS[p.status].label));
+  c.append(head);
+
+  c.append(el("h3", "card-title", p.name));
+  if (p.org) c.append(el("p", "card-org", p.org));
+  if (p.mission) c.append(el("p", "card-mission", p.mission));
+
+  if (p.components.length) {
+    const ul = el("ul", "card-systems");
+    p.components.slice(0, 4).forEach(s => ul.append(el("li", null, s)));
+    if (p.components.length > 4) ul.append(el("li", "more", "+" + (p.components.length - 4) + " more"));
+    c.append(ul);
+  }
+  p.flags.slice(0, 2).forEach(f => c.append(el("div", "flag", f)));
+  if (p.flags.length > 2) c.append(el("div", "flag", "+" + (p.flags.length - 2) + " more flags"));
+
+  if (isLive(p)) {
+    const nx = el("div", "card-next");
+    nx.append(el("span", "k", "Next action"));
+    nx.append(el("span", "v" + (p.next.trim() ? "" : " unset"), p.next.trim() || (canWrite === false ? "Not set" : "Not set. Open the card to log one.")));
+    c.append(nx);
+  }
+
+  const foot = el("div", "card-foot");
+  const d = daysUntil(p.due);
+  if (p.due) {
+    const r = el("span", "readout" + (d < 0 ? " over" : d <= 14 ? " soon" : ""), d < 0 ? (-d) + " d overdue · " + fmtShort(p.due) : d === 0 ? "Due today" : "T−" + d + " d · " + fmtShort(p.due));
+    foot.append(r);
+  } else if (p.progress == null) {
+    foot.append(el("span", "readout", p.status === "parked" ? "On the shelf" : "No date"));
+  }
+  if (p.progress != null) {
+    const pr = el("div", "progress");
+    const segs = el("div", "segs");
+    segs.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 10; i++) { const s = el("i"); if (p.progress >= (i + 1) * 10 - 5) s.className = "on"; segs.append(s); }
+    pr.append(segs, el("span", "readout", Math.round(p.progress) + "%"));
+    foot.append(pr);
+  }
+  const acts = el("div", "card-actions");
+  const brief = el("button", "btn sm", "Brief");
+  brief.type = "button";
+  brief.setAttribute("aria-label", "Hear the status of " + p.name);
+  brief.addEventListener("click", e => { e.stopPropagation(); briefProject(p); });
+  acts.append(brief);
+  if (canWrite !== false && db) {
+    const ed = el("button", "btn sm", "Edit");
+    ed.type = "button";
+    ed.addEventListener("click", e => { e.stopPropagation(); openEditor(p.id); });
+    acts.append(ed);
+  }
+  foot.append(acts);
+  c.append(foot);
+
+  const primary = () => (canWrite !== false && db) ? openEditor(p.id) : briefProject(p);
+  c.addEventListener("click", primary);
+  c.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target === c) { e.preventDefault(); primary(); } });
+  return c;
+}
+
+function renderHorizon() {
+  const track = $("#track"), list = $("#horizon"), empty = $("#horizon-empty");
+  track.textContent = ""; list.textContent = "";
+  if (!loaded) { empty.hidden = true; return; }
+  const SPAN = 120;
+  const t0 = todayMid();
+  // ticks every 30 days
+  for (let i = 0; i <= SPAN; i += 30) {
+    const left = (i / SPAN * 100) + "%";
+    const tk = el("div", "tick" + (i === 0 ? " today" : "")); tk.style.left = left; track.append(tk);
+    const dt = new Date(t0.getFullYear(), t0.getMonth(), t0.getDate() + i);
+    const lb = el("div", "tick-label" + (i === 0 ? " today" : ""), i === 0 ? "Today" : dt.toLocaleDateString("en-US", { day: "numeric", month: "short" }));
+    lb.style.left = left; if (i === 0) lb.style.transform = "none"; if (i === SPAN) lb.style.transform = "translateX(-100%)";
+    track.append(lb);
+  }
+  const dated = projects.filter(p => p.due && p.status !== "done").map(p => ({ p, d: daysUntil(p.due) })).sort((a, b) => a.d - b.d);
+  empty.hidden = dated.length > 0;
+  let flip = false;
+  dated.filter(x => x.d >= 0 && x.d <= SPAN).forEach(x => {
+    const left = (x.d / SPAN * 100);
+    const m = el("div", "mark"); m.style.left = left + "%";
+    m.style.setProperty("--st", x.p.status === "watch" ? "var(--amber)" : x.p.status === "planning" ? "var(--plan)" : "var(--holo)");
+    track.append(m);
+    const lb = el("div", "mark-label" + (flip ? " lo" : ""));
+    lb.append(el("span", null, x.p.name), el("small", null, "T−" + x.d + " d"));
+    lb.style.left = left + "%";
+    if (left > 80) lb.style.transform = "translateX(-100%)";
+    if (left < 12) lb.style.transform = "none";
+    track.append(lb);
+    flip = !flip;
+  });
+  dated.forEach(x => {
+    const li = el("li");
+    li.append(el("span", "d", fmtShort(x.p.due)));
+    li.append(el("span", "t" + (x.d < 0 ? " over" : x.d <= 14 ? " soon" : ""), x.d < 0 ? (-x.d) + " d over" : "T−" + x.d + " d"));
+    li.append(el("span", "n", x.p.name));
+    li.append(el("span", "readout s", STATUS[x.p.status].label));
+    list.append(li);
+  });
+}
+
+/* ---------- shared write helpers ---------- */
+function writeDoc(path, fn) {
+  const prev = writeChain.get(path) || Promise.resolve();
+  const next = prev.catch(() => {}).then(fn);
+  writeChain.set(path, next);
+  return next;
+}
+function canEditData() { return !!db && canWrite !== false; }
+function writeErr(e, what) {
+  what = what || "checklist";
+  if (e && e.code === "invalid_argument") return "This view can't change the " + what + ".";
+  if (e && e.code === "quota_exceeded") return "Storage is full. Remove some old items first.";
+  return "That didn't save. Check your connection and try again.";
+}
+
+/* ---------- checklist ---------- */
+function normCheck(id, d) {
+  d = d || {};
+  return {
+    id, text: String(d.text || "Untitled item"), daily: !!d.daily, done: !!d.done,
+    doneOn: typeof d.doneOn === "string" ? d.doneOn : null, doneAt: d.doneAt || null,
+    project: d.project ? String(d.project) : null, order: typeof d.order === "number" ? d.order : 999
+  };
+}
+function isChecked(it) { return it.daily ? it.doneOn === isoToday() : it.done; }
+function checkStats() {
+  const t = isoToday();
+  const rel = checklist.filter(i => i.daily || !i.done || i.doneOn === t);
+  return {
+    done: rel.filter(isChecked).length, total: rel.length,
+    openDaily: checklist.filter(i => i.daily && !isChecked(i)),
+    openTodos: checklist.filter(i => !i.daily && !i.done)
+  };
+}
+function checkNote(msg) { const n = $("#check-note"); n.textContent = msg || ""; n.hidden = !msg; }
+function renderChecklist() {
+  const dl = $("#check-daily-list"), tl = $("#check-todo-list"), meter = $("#check-meter");
+  dl.textContent = ""; tl.textContent = ""; meter.textContent = "";
+  const writable = canEditData();
+  $("#check-form").hidden = !writable;
+  if (!checkLoaded) {
+    dl.append(el("li", "check-empty", db === false ? "Checklist offline. Open this page signed in to claude.ai." : "Loading…"));
+    $("#check-count").textContent = "—"; $("#check-show-done").hidden = true; meter.hidden = true; return;
+  }
+  const t = isoToday();
+  const byOrder = (a, b) => (a.order - b.order) || a.text.localeCompare(b.text);
+  const daily = checklist.filter(i => i.daily).sort(byOrder);
+  const todos = checklist.filter(i => !i.daily).sort((a, b) => (Number(isChecked(a)) - Number(isChecked(b))) || byOrder(a, b));
+  const current = todos.filter(i => !i.done || i.doneOn === t);
+  const hidden = todos.length - current.length;
+  const shown = showDone ? todos : current;
+  if (!daily.length) dl.append(el("li", "check-empty", writable ? "No routines yet. Tick Daily when you add an item and it resets every midnight." : "No routines yet."));
+  daily.forEach(i => dl.append(checkRow(i, writable)));
+  if (!shown.length) tl.append(el("li", "check-empty", todos.length ? "All clear." : "Nothing on the list."));
+  shown.forEach(i => tl.append(checkRow(i, writable)));
+  const sd = $("#check-show-done");
+  sd.hidden = !hidden;
+  sd.textContent = showDone ? "Hide earlier completed" : "Show earlier completed (" + hidden + ")";
+  const st = checkStats();
+  $("#check-count").textContent = st.total ? st.done + "/" + st.total + " done today" : "Empty";
+  const n = Math.min(st.total, 24);
+  meter.hidden = !st.total;
+  meter.style.setProperty("--n", String(Math.max(n, 1)));
+  const on = st.total ? Math.round(st.done / st.total * n) : 0;
+  for (let i = 0; i < n; i++) { const s = el("i"); if (i < on) s.className = "on"; meter.append(s); }
+}
+function checkRow(it, writable) {
+  const li = el("li", "check-item" + (isChecked(it) ? " done" : ""));
+  const box = el("button", "check-box");
+  box.type = "button";
+  box.setAttribute("role", "checkbox");
+  box.setAttribute("aria-checked", String(isChecked(it)));
+  box.setAttribute("aria-label", it.text);
+  box.disabled = !writable;
+  box.addEventListener("click", () => { toggleItem(it).catch(() => {}); });
+  const body = el("div", "check-text");
+  body.append(document.createTextNode(it.text));
+  const proj = it.project ? projects.find(p => p.id === it.project) : null;
+  if (proj) body.append(el("span", "check-tag", proj.name));
+  li.append(box, body);
+  if (writable) {
+    const del = el("button", "check-del", "Remove");
+    del.type = "button";
+    del.setAttribute("aria-label", "Remove " + it.text);
+    let armed = false, tmr = 0;
+    del.addEventListener("click", () => {
+      if (!armed) {
+        armed = true; del.classList.add("arm"); del.textContent = "Sure?";
+        tmr = setTimeout(() => { armed = false; del.classList.remove("arm"); del.textContent = "Remove"; }, 3000);
+        return;
+      }
+      clearTimeout(tmr);
+      writeDoc("checklist/" + it.id, () => db.doc("checklist/" + it.id).delete()).catch(e => checkNote(writeErr(e)));
+    });
+    li.append(del);
+  }
+  return li;
+}
+function toggleItem(it) {
+  if (!canEditData()) return Promise.reject(new Error("read-only"));
+  const on = !isChecked(it), t = isoToday(), now = new Date().toISOString();
+  const patch = it.daily ? { doneOn: on ? t : null, doneAt: on ? now : null } : { done: on, doneOn: on ? t : null, doneAt: on ? now : null };
+  return writeDoc("checklist/" + it.id, () => db.doc("checklist/" + it.id).update(patch))
+    .then(() => checkNote(""), e => { checkNote(writeErr(e)); throw e; });
+}
+function addItem(text, daily, project) {
+  const order = checklist.reduce((m, i) => Math.max(m, i.order < 999 ? i.order : 0), 0) + 1;
+  return db.collection("checklist").add({
+    text: String(text).slice(0, 140), daily: !!daily, done: false, doneOn: null, doneAt: null,
+    project: project || null, order, createdAt: new Date().toISOString()
+  });
+}
+$("#check-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const inp = $("#check-input"), text = inp.value.trim();
+  if (!text || !canEditData()) return;
+  inp.value = "";
+  try { await addItem(text, $("#check-daily").checked, null); checkNote(""); }
+  catch (err) { inp.value = text; checkNote(writeErr(err)); }
+});
+$("#check-show-done").addEventListener("click", () => { showDone = !showDone; renderChecklist(); });
+
+/* ---------- daily log ---------- */
+function normLog(id, d) {
+  d = d || {};
+  const arr = v => Array.isArray(v) ? v.filter(x => x != null && x !== "") : [];
+  return {
+    id, date: parseISO(d.date) ? d.date : (parseISO(id) ? id : null),
+    title: d.title ? String(d.title) : "", summary: d.summary ? String(d.summary) : "",
+    highlights: arr(d.highlights).map(String), tomorrow: arr(d.tomorrow).map(String), projects: arr(d.projects).map(String),
+    outputs: arr(d.outputs).map(o => typeof o === "object" ? { title: String(o.title || o.name || "Output"), url: String(o.url || "") } : { title: String(o), url: "" }),
+    checklist: d.checklist && typeof d.checklist === "object" ? { done: Number(d.checklist.done) || 0, total: Number(d.checklist.total) || 0 } : null,
+    notes: d.notes ? String(d.notes) : "", source: d.source ? String(d.source) : "", writtenAt: d.writtenAt ? String(d.writtenAt) : ""
+  };
+}
+function hasBody(l) { return !!(l && (l.summary || l.title || l.highlights.length)); }
+function safeUrl(u) { try { const x = new URL(u); return x.protocol === "https:" ? x.href : ""; } catch (e) { return ""; } }
+function logDays() {
+  const t = isoToday();
+  const list = logs.filter(l => l.date);
+  if (!list.some(l => l.date === t)) list.push(normLog(t, { date: t }));
+  return list.sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+}
+function logEmpty(title, text) {
+  const b = el("div", "log-empty");
+  b.append(el("strong", null, title));
+  if (text) b.append(el("span", null, text));
+  return b;
+}
+let notesTimer = 0;
+function renderLog() {
+  const days = $("#log-days"), body = $("#log-body"), wrap = $("#log-notes-wrap");
+  days.textContent = ""; body.textContent = "";
+  if (!logLoaded) {
+    body.append(logEmpty(db === false ? "Log offline" : "Loading the log", db === false ? "Open this page signed in to claude.ai to see your entries." : ""));
+    wrap.hidden = true; return;
+  }
+  const list = logDays();
+  if (!selectedDay || !list.some(l => l.date === selectedDay)) {
+    const latest = list.find(hasBody);
+    selectedDay = latest ? latest.date : list[0].date;
+  }
+  list.slice(0, 45).forEach(l => {
+    const d = parseISO(l.date);
+    const b = el("button", "log-day" + (hasBody(l) ? "" : " pending"));
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(l.date === selectedDay));
+    b.title = fmtLong(d);
+    b.append(el("span", "dw", l.date === isoToday() ? "Today" : d.toLocaleDateString("en-US", { weekday: "short" })));
+    b.append(el("span", "dn", String(d.getDate())));
+    b.append(el("span", "dm", d.toLocaleDateString("en-US", { month: "short" })));
+    b.addEventListener("click", () => { flushNotes(); selectedDay = l.date; renderLog(); });
+    days.append(b);
+  });
+  const e = list.find(l => l.date === selectedDay);
+  const isToday = e.date === isoToday();
+  const head = el("div", "log-head");
+  head.append(el("div", "eyebrow", "Log · " + fmtLong(parseISO(e.date))));
+  head.append(el("h3", "log-title", e.title || (isToday ? "Today, still in progress" : "No entry")));
+  const meta = [];
+  if (e.source === "auto") meta.push("Auto entry"); else if (e.source === "manual") meta.push("Your notes only");
+  if (e.writtenAt) { const w = new Date(e.writtenAt); if (!isNaN(w)) meta.push("written " + w.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })); }
+  if (e.checklist && e.checklist.total) meta.push("checklist " + e.checklist.done + "/" + e.checklist.total);
+  if (meta.length) head.append(el("div", "log-meta", meta.join(" · ")));
+  body.append(head);
+  if (!hasBody(e)) {
+    body.append(logEmpty(isToday ? "Tonight's entry lands at 11:59 PM" : "Nothing was logged this day",
+      isToday ? (settings.name || "ASTRA") + " writes it from your Claude conversations, the pages and files you made, your calendar and this checklist. Add your own notes below anytime." : ""));
+  } else {
+    if (e.summary) body.append(el("p", "log-summary", e.summary));
+    const grid = el("div", "log-grid");
+    const block = (k, items, fill) => {
+      if (!items.length) return;
+      const b = el("div", "log-block"); b.append(el("div", "k", k));
+      const ul = el("ul"); items.forEach(x => ul.append(fill(x))); b.append(ul); grid.append(b);
+    };
+    block("Highlights", e.highlights, x => el("li", null, x));
+    block("Outputs", e.outputs, o => {
+      const li = el("li"); const u = safeUrl(o.url);
+      if (u) { const a = el("a", null, o.title); a.href = u; a.target = "_blank"; a.rel = "noopener noreferrer"; li.append(a); }
+      else li.append(o.title);
+      return li;
+    });
+    block("Projects touched", e.projects, id => { const p = projects.find(x => x.id === id); return el("li", null, p ? p.name : id); });
+    block("Carry into tomorrow", e.tomorrow, x => el("li", null, x));
+    if (grid.childNodes.length) body.append(grid);
+  }
+  const ta = $("#log-notes"), writable = canEditData();
+  wrap.hidden = !writable && !e.notes && !hasBody(e);
+  ta.hidden = !writable && !e.notes;
+  $("#log-notes-wrap label").hidden = ta.hidden;
+  ta.readOnly = !writable;
+  if (!(document.activeElement === ta && ta.dataset.date === e.date)) { ta.value = e.notes || ""; ta.dataset.date = e.date; }
+  $("#log-read").hidden = !hasBody(e);
+}
+async function saveNotes(date, text) {
+  if (!canEditData() || !date) return;
+  const msg = $("#log-notes-msg");
+  msg.classList.remove("bad"); msg.textContent = "Saving…";
+  const path = "log/" + date;
+  const exists = logs.some(l => l.id === date);
+  try {
+    await writeDoc(path, () => exists ? db.doc(path).update({ notes: text }) : db.doc(path).set({ date, notes: text, source: "manual", writtenAt: new Date().toISOString() }));
+    msg.textContent = "Saved";
+  } catch (err) { msg.classList.add("bad"); msg.textContent = writeErr(err, "log"); }
+}
+function flushNotes() {
+  if (!notesTimer) return;
+  clearTimeout(notesTimer); notesTimer = 0;
+  const ta = $("#log-notes"); saveNotes(ta.dataset.date, ta.value);
+}
+$("#log-notes").addEventListener("input", () => {
+  const ta = $("#log-notes"), date = ta.dataset.date;
+  $("#log-notes-msg").classList.remove("bad");
+  $("#log-notes-msg").textContent = "Unsaved";
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(() => { notesTimer = 0; saveNotes(date, ta.value); }, 900);
+});
+$("#log-notes").addEventListener("blur", flushNotes);
+$("#log-read").addEventListener("click", () => {
+  const e = logDays().find(l => l.date === selectedDay);
+  if (!hasBody(e)) return;
+  const parts = [e.title ? trimDot(e.title) + "." : "", e.summary];
+  if (e.tomorrow.length) parts.push("For tomorrow: " + e.tomorrow.map(trimDot).join("; ") + ".");
+  sayBegin(); sayPush(parts.filter(Boolean).join(" ")); sayEnd();
+});
+
+/* ---------- what the assistant can see and change (checklist) ---------- */
+function checklistSnapshot() {
+  return checklist.slice(0, 80).map(i => ({ id: i.id, text: i.text, daily: i.daily, checked_today: isChecked(i), done: i.done, project_id: i.project }));
+}
+function logSnapshot() {
+  return logs.filter(l => hasBody(l) || l.notes).sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 5)
+    .map(l => ({ date: l.date, title: l.title, summary: l.summary, tomorrow: l.tomorrow, notes: l.notes.slice(0, 400) }));
+}
+const checklistTool = {
+  name: "update_checklist",
+  description: "Add an item to the user's checklist, or check off or uncheck an existing one. Use only when he clearly asks. Returns what changed.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      action: { type: "string", enum: ["add", "check", "uncheck"] },
+      item_id: { type: "string", description: "The existing item's id from the checklist, for check or uncheck." },
+      text: { type: "string", description: "The new item's text, for add. Short and concrete." },
+      daily: { type: "boolean", description: "For add: true if it repeats every day and resets at midnight." },
+      project_id: { type: "string", description: "Optional: the id of the project this item belongs to." }
+    },
+    required: ["action"]
+  },
+  async execute(input) {
+    if (!canEditData()) throw new Error("The checklist is read-only for this viewer.");
+    const action = String(input.action || "");
+    if (action === "add") {
+      const text = String(input.text || "").trim();
+      if (!text) throw new Error("text is required to add an item");
+      const pid = input.project_id && projects.some(p => p.id === String(input.project_id)) ? String(input.project_id) : null;
+      try { await addItem(text, !!input.daily, pid); } catch (e) { throw new Error(writeErr(e)); }
+      addTurn("sys", "Checklist: added “" + text.slice(0, 140) + "”" + (input.daily ? " (daily)" : ""));
+      return { ok: true, added: text, daily: !!input.daily };
+    }
+    if (action === "check" || action === "uncheck") {
+      const it = checklist.find(i => i.id === String(input.item_id || ""));
+      if (!it) throw new Error("No item with that id. Valid ids: " + checklist.map(i => i.id).join(", "));
+      const want = action === "check";
+      if (isChecked(it) !== want) { try { await toggleItem(it); } catch (e) { throw new Error(writeErr(e)); } }
+      addTurn("sys", "Checklist: " + (want ? "checked off" : "unchecked") + " “" + it.text + "”");
+      return { ok: true, item: it.text, checked: want };
+    }
+    throw new Error("action must be add, check or uncheck");
+  }
+};
+
+/* ---------- names ---------- */
+function applyNames() {
+  $$(".js-ai-name").forEach(n => n.textContent = settings.name || "ASTRA");
+}
+applyNames();
+
+/* ---------- voice engine ---------- */
+const synth = ("speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function") ? window.speechSynthesis : null;
+let voices = [];
+const PREFS = [/aria/i, /jenny/i, /ava\b/i, /samantha/i, /allison/i, /serena/i, /libby/i, /sonia/i, /natasha/i, /emma/i, /google uk english female/i, /zira/i, /karen/i, /moira/i, /tessa/i, /female/i, /google us english/i];
+const SMOOTH = /natural|neural|online|premium|enhanced/i;
+
+function loadVoices() {
+  if (!synth) return;
+  try { voices = synth.getVoices() || []; } catch (e) { voices = []; }
+  populateVoiceSelect();
+  updateVoiceLabel();
+  if (core.state === "standby" && typeof setState === "function") setState("standby");
+}
+if (synth) {
+  loadVoices();
+  if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", loadVoices);
+  else synth.onvoiceschanged = loadVoices;
+}
+function pickVoice() {
+  if (!voices.length) return null;
+  if (settings.voiceURI) { const v = voices.find(v => v.voiceURI === settings.voiceURI); if (v) return v; }
+  const en = voices.filter(v => /^en/i.test(v.lang || ""));
+  const pool = en.length ? en : voices;
+  for (const re of PREFS) {
+    const hits = pool.filter(v => re.test(v.name));
+    if (hits.length) return hits.find(v => SMOOTH.test(v.name)) || hits[0];
+  }
+  return pool.find(v => SMOOTH.test(v.name)) || pool[0];
+}
+function voiceAvailable() { return !!(synth && voices.length && !settings.mute); }
+function updateVoiceLabel() {
+  const lab = $("#core-voice");
+  if (!synth) { lab.textContent = "Captions only"; return; }
+  if (settings.mute) { lab.textContent = "Voice muted"; return; }
+  const v = pickVoice();
+  lab.textContent = v ? v.name.replace(/^Microsoft\s+/i, "").replace(/\s*\(.*\)\s*$/, "").replace(/ - .*$/, "") : "Loading voices";
+}
+function populateVoiceSelect() {
+  const sel = $("#s-voice");
+  sel.textContent = "";
+  const auto = el("option", null, "Automatic (best English female voice)"); auto.value = ""; sel.append(auto);
+  const en = voices.filter(v => /^en/i.test(v.lang || "")), other = voices.filter(v => !/^en/i.test(v.lang || ""));
+  const group = (label, list) => { if (!list.length) return; const g = document.createElement("optgroup"); g.label = label; list.forEach(v => { const o = el("option", null, v.name + " · " + v.lang); o.value = v.voiceURI; g.append(o); }); sel.append(g); };
+  group("English", en); group("Other languages", other);
+  sel.value = settings.voiceURI && voices.some(v => v.voiceURI === settings.voiceURI) ? settings.voiceURI : "";
+  $("#s-voice-hint").textContent = !synth ? "This view has no speech engine, so she speaks in captions only." :
+    voices.length ? voices.length + " voices on this device." : "No voices reported yet. They usually appear a second after the page loads.";
+}
+
+function speakable(s) {
+  return String(s)
+    .replace(/µ-?/g, "micro ")
+    .replace(/\bLCN\b/g, "L C N")
+    .replace(/\bKLAL\b/g, "K L A L")
+    .replace(/\bTEDP\b/g, "T E D P")
+    .replace(/\bEN\/ES\b/g, "English and Spanish")
+    .replace(/(\d)\s*–\s*(\d)/g, "$1 to $2")
+    .replace(/T−(\d+)/g, "T minus $1")
+    .replace(/→/g, " to ")
+    .replace(/[·•|]/g, ", ")
+    .replace(/\s+/g, " ").trim();
+}
+
+/* Speech queue: sentences play in order, captions type along. */
+const speech = { token: 0, queue: [], busy: false, closed: true, captionSpan: null, fresh: false };
+function sayBegin() {
+  speech.token++;
+  speech.queue = []; speech.busy = false; speech.closed = false;
+  if (synth) { try { synth.cancel(); } catch (e) {} speech.fresh = true; }
+  const cap = $("#caption");
+  cap.textContent = "";
+  cap.append(el("span", "who", settings.name || "ASTRA"));
+  speech.captionSpan = el("span");
+  cap.append(speech.captionSpan);
+  $("#stop-btn").disabled = false;
+}
+function sayPush(text) {
+  String(text).split(/(?<=[.!?])\s+(?=[A-Z0-9“"'(])/).forEach(s => { s = s.trim(); if (s) speech.queue.push(s); });
+  pump();
+}
+function sayEnd() { speech.closed = true; pump(); }
+function sayStop() {
+  speech.token++; speech.queue = []; speech.busy = false; speech.closed = true;
+  if (synth) { try { synth.cancel(); } catch (e) {} }
+  if (askCtl) { askCtl.abort(); askCtl = null; }
+  setState("standby");
+}
+function estimateMs(s) { return Math.max(900, s.length * 62 / (settings.rate || 1)); }
+function pump() {
+  if (speech.busy) return;
+  const s = speech.queue.shift();
+  if (s === undefined) { if (speech.closed) setState("standby"); return; }
+  speech.busy = true;
+  setState("speaking");
+  const token = speech.token;
+  const dur = estimateMs(s);
+  typeCaption(s, token, dur);
+  let done = false;
+  const next = () => { if (done || token !== speech.token) return; done = true; speech.busy = false; pump(); };
+  if (!voiceAvailable()) { setTimeout(next, dur + 180); return; }
+  try {
+    const u = new SpeechSynthesisUtterance(speakable(s));
+    const v = pickVoice();
+    if (v) { u.voice = v; u.lang = v.lang; }
+    u.rate = settings.rate; u.pitch = settings.pitch;
+    u.onboundary = () => { core.kick = 1; };
+    u.onend = next;
+    u.onerror = next;
+    try { synth.resume(); } catch (e) {}
+    if (speech.fresh) { speech.fresh = false; setTimeout(() => { if (token === speech.token) synth.speak(u); }, 90); }
+    else synth.speak(u);
+    setTimeout(() => { if (!done && token === speech.token) { try { synth.cancel(); } catch (e) {} next(); } }, dur * 2.2 + 5000);
+  } catch (e) { setTimeout(next, dur); }
+}
+function typeCaption(s, token, dur) {
+  const span = speech.captionSpan; if (!span) return;
+  const cap = $("#caption");
+  const piece = el("span", null, "");
+  if (span.childNodes.length) span.append(" ");
+  span.append(piece);
+  if (reduceMotion) { piece.textContent = s; cap.scrollTop = cap.scrollHeight; return; }
+  const start = performance.now();
+  const step = now => {
+    if (token !== speech.token) { piece.textContent = s; return; }
+    const k = Math.min(1, (now - start) / (dur * 0.92));
+    piece.textContent = s.slice(0, Math.ceil(s.length * k));
+    cap.scrollTop = cap.scrollHeight;
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/* ---------- state display ---------- */
+function setState(st) {
+  core.state = st;
+  const label = { standby: "Standby", speaking: "Speaking", thinking: "Thinking" }[st] || st;
+  $("#core-state").textContent = label;
+  const chip = $("#voice-chip");
+  chip.dataset.state = st === "standby" ? "ready" : st;
+  chip.textContent = st === "speaking" ? (voiceAvailable() ? "Speaking" : "Captioning") : st === "thinking" ? "Thinking" : (voiceAvailable() ? "Voice ready" : synth ? "Voice standby" : "Captions only");
+  $("#stop-btn").disabled = st === "standby";
+  if (reduceMotion) drawCore(performance.now());
+}
+
+/* ---------- holographic core (canvas) ---------- */
+core.ctx = core.cv.getContext("2d");
+const css = getComputedStyle(document.documentElement);
+const tok = n => css.getPropertyValue(n).trim() || "#4FD8FF";
+const COL = { holo: tok("--holo"), amber: tok("--amber"), plan: tok("--plan") };
+function rgba(hex, a) {
+  const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.replace(/./g, "$&$&") : h, 16);
+  return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+}
+function sizeCore() {
+  const wrap = $("#core-wrap");
+  const s = Math.max(160, Math.floor(Math.min(wrap.clientWidth || 300, 340)));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  core.cv.width = Math.round(s * dpr); core.cv.height = Math.round(s * dpr);
+  core.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  core.size = s;
+  drawCore(performance.now());
+}
+function drawCore(now) {
+  const ctx = core.ctx, s = core.size; if (!s) return;
+  const c = s / 2, R = c - 3, t = (now - core.t0) / 1000;
+  const spin = reduceMotion ? 0 : 1;
+  let target;
+  if (core.state === "speaking") target = 0.38 + 0.42 * Math.abs(Math.sin(t * 8.3) * Math.sin(t * 3.1 + 1.2)) + core.kick * 0.3;
+  else if (core.state === "thinking") target = 0.2 + 0.06 * Math.sin(t * 5);
+  else target = 0.06 + 0.03 * Math.sin(t * 1.3);
+  core.kick *= 0.88;
+  core.level += (target - core.level) * 0.16;
+  const L = core.level;
+  ctx.clearRect(0, 0, s, s);
+
+  // outer tick ring
+  ctx.save(); ctx.translate(c, c); ctx.rotate(t * 0.05 * spin);
+  for (let i = 0; i < 120; i++) {
+    const a = i / 120 * TAU, long = i % 10 === 0, mid = i % 5 === 0;
+    const r2 = R - (long ? 11 : mid ? 6 : 3);
+    ctx.strokeStyle = rgba(COL.holo, long ? 0.85 : mid ? 0.5 : 0.25);
+    ctx.lineWidth = long ? 1.6 : 1;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a) * R, Math.sin(a) * R); ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2); ctx.stroke();
+  }
+  ctx.restore();
+
+  // segmented arcs
+  const fast = core.state === "thinking" ? 3.2 : 1;
+  ctx.save(); ctx.translate(c, c); ctx.rotate(-t * 0.32 * spin * fast);
+  ctx.lineWidth = 3; ctx.lineCap = "butt";
+  [[0, 0.95], [1.35, 2.55], [3.2, 4.15]].forEach(([a, b]) => { ctx.strokeStyle = rgba(COL.holo, 0.8); ctx.beginPath(); ctx.arc(0, 0, R * 0.84, a, b); ctx.stroke(); });
+  ctx.strokeStyle = rgba(COL.amber, 0.9); ctx.beginPath(); ctx.arc(0, 0, R * 0.84, 4.6, 5.05); ctx.stroke();
+  ctx.restore();
+
+  // dashed ring
+  ctx.save(); ctx.translate(c, c); ctx.rotate(t * 0.14 * spin);
+  ctx.setLineDash([2, 6]); ctx.strokeStyle = rgba(COL.holo, 0.38); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.74, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+
+  // thinking sweep
+  if (core.state === "thinking") {
+    ctx.save(); ctx.translate(c, c); ctx.rotate(t * 4 * (spin || 0.2));
+    ctx.strokeStyle = rgba(COL.plan, 0.85); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.66, 0, 0.9); ctx.stroke();
+    ctx.restore();
+  }
+
+  // voice spectrum
+  ctx.save(); ctx.translate(c, c);
+  const N = 72, rb = R * 0.5;
+  for (let i = 0; i < N; i++) {
+    const a = i / N * TAU - Math.PI / 2;
+    const n = 0.5 + 0.5 * Math.sin(i * 1.7 + t * 6.1) * Math.sin(i * 0.61 - t * 4.3);
+    const len = R * 0.025 + L * R * 0.17 * (0.35 + 0.65 * n);
+    ctx.strokeStyle = rgba(i % 9 === 0 ? COL.plan : COL.holo, 0.3 + 0.6 * L);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a) * rb, Math.sin(a) * rb); ctx.lineTo(Math.cos(a) * (rb + len), Math.sin(a) * (rb + len)); ctx.stroke();
+  }
+  ctx.restore();
+
+  // inner glow + ring
+  const gr = R * 0.44 * (1 + L * 0.1);
+  const g = ctx.createRadialGradient(c, c, 0, c, c, gr);
+  g.addColorStop(0, rgba(COL.holo, 0.16 + 0.3 * L));
+  g.addColorStop(0.6, rgba(COL.holo, 0.07 + 0.1 * L));
+  g.addColorStop(1, rgba(COL.holo, 0));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c, c, gr, 0, TAU); ctx.fill();
+  ctx.strokeStyle = rgba(COL.holo, 0.75); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(c, c, R * 0.42, 0, TAU); ctx.stroke();
+}
+function loop(now) {
+  drawCore(now);
+  core.raf = requestAnimationFrame(loop);
+}
+function startLoop() { if (!core.raf) core.raf = requestAnimationFrame(loop); }
+function stopLoop() { if (core.raf) cancelAnimationFrame(core.raf); core.raf = 0; }
+sizeCore();
+if (typeof ResizeObserver === "function") new ResizeObserver(() => sizeCore()).observe($("#core-wrap"));
+else window.addEventListener("resize", sizeCore);
+document.addEventListener("visibilitychange", () => { if (document.hidden) stopLoop(); else startLoop(); });
+startLoop();
+
+/* ---------- briefings ---------- */
+function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
+function buildBriefing() {
+  const now = new Date(), h = now.getHours();
+  const greet = h < 5 ? "Burning the midnight oil" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  const out = [greet + ", " + (settings.callsign || "there") + ".", "It's " + now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) + "."];
+  if (!loaded) { out.push("I'm still syncing your registry. Give me a second and try again."); return out; }
+  if (!projects.length) { out.push("Your registry is empty. Add a project and I'll start tracking it."); return out; }
+  const live = projects.filter(isLive);
+  const c = s => projects.filter(p => p.status === s).length;
+  const parts = [];
+  if (c("watch")) parts.push(c("watch") + " on watch");
+  if (c("planning")) parts.push(c("planning") + " in planning");
+  if (c("parked")) parts.push(c("parked") + " parked");
+  out.push("You have " + plural(c("active"), "active project", "active projects") + (parts.length ? ", " + parts.slice(0, -1).join(", ") + (parts.length > 1 ? ", and " : "") + parts[parts.length - 1] : "") + ".");
+  const dated = live.filter(p => p.due).map(p => ({ p, d: daysUntil(p.due) })).sort((a, b) => a.d - b.d);
+  dated.filter(x => x.d < 0).slice(0, 2).forEach(x => out.push(x.p.name + " is " + plural(-x.d, "day", "days") + " past due."));
+  const up = dated.filter(x => x.d >= 0);
+  if (up.length) {
+    const x = up[0];
+    out.push(x.d === 0 ? x.p.name + " is due today." : x.d === 1 ? x.p.name + " is tomorrow." :
+      x.p.name + " is " + x.d + " days out" + (x.d >= 14 ? ", about " + Math.round(x.d / 7) + " weeks" : "") + ".");
+  }
+  const flagged = live.filter(p => p.flags.length);
+  if (flagged.length) {
+    const n = flagged.reduce((k, p) => k + p.flags.length, 0);
+    out.push(plural(n, "flag needs", "flags need") + " your attention.");
+    flagged.slice(0, 2).forEach(p => out.push("On " + p.name + ": " + trimDot(p.flags[0]) + "."));
+  }
+  if (checkLoaded && checklist.length) {
+    const st = checkStats();
+    out.push("Checklist: " + st.done + " of " + st.total + " done today.");
+    if (st.openDaily.length) out.push("Still on today's routine: " + st.openDaily.slice(0, 3).map(i => trimDot(i.text)).join(", ") + ".");
+  }
+  const yd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  const yIso = yd.getFullYear() + "-" + String(yd.getMonth() + 1).padStart(2, "0") + "-" + String(yd.getDate()).padStart(2, "0");
+  const lastLog = logs.find(l => l.date === yIso && hasBody(l));
+  if (lastLog) out.push("Last night's log: " + trimDot(lastLog.title || lastLog.summary) + ".");
+  const withNext = live.filter(p => p.next.trim());
+  withNext.slice(0, 3).forEach(p => out.push("Next on " + p.name + ": " + trimDot(p.next) + "."));
+  const missing = live.length - withNext.length;
+  if (missing > 0) out.push((missing === live.length ? "None of your live projects have" : missing + " live projects don't have") + " a next action logged. Give me one per card and I'll hold you to it.");
+  out.push("That's the board. Standing by.");
+  return out;
+}
+function briefProject(p) {
+  const d = daysUntil(p.due);
+  const out = [p.name + ". Status: " + STATUS[p.status].label.toLowerCase() + "."];
+  if (p.mission) out.push(trimDot(p.mission) + ".");
+  if (p.due) out.push(d < 0 ? "It's " + plural(-d, "day", "days") + " past due." : d === 0 ? "It's due today." : "Due in " + plural(d, "day", "days") + ", on " + fmtShort(p.due) + ".");
+  if (p.progress != null) out.push("Progress is at " + Math.round(p.progress) + " percent.");
+  p.flags.slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
+  if (isLive(p)) out.push(p.next.trim() ? "Next action: " + trimDot(p.next) + "." : "No next action logged yet.");
+  sayBegin(); sayPush(out.join(" ")); sayEnd();
+}
+$("#brief-btn").addEventListener("click", () => {
+  const lines = buildBriefing();
+  sayBegin(); sayPush(lines.join(" ")); sayEnd();
+  addTurn("ai", lines.join(" "), "Briefing · " + new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }));
+});
+$("#stop-btn").addEventListener("click", sayStop);
+
+/* ---------- transcript ---------- */
+function addTurn(kind, text, whoLabel) {
+  const box = $("#transcript");
+  const first = box.querySelector(".empty-line"); if (first) first.remove();
+  const t = el("div", "turn " + kind);
+  t.append(el("span", "who", whoLabel || (kind === "you" ? (settings.callsign || "You") : kind === "sys" ? "Registry" : (settings.name || "ASTRA"))));
+  const tx = el("span", "txt", text);
+  t.append(tx);
+  box.append(t);
+  while (box.children.length > 30) box.firstElementChild.remove();
+  box.scrollTop = box.scrollHeight;
+  return tx;
+}
+
+/* ---------- ask (uses Claude via the page's sample capability) ---------- */
+async function ensureSample() {
+  if (sampleChecked) return sampleFn;
+  sampleFn = await samplePromise;
+  sampleChecked = true;
+  if (sampleFn && typeof sampleFn.limits === "function") {
+    try { const lim = await sampleFn.limits(); toolsOK = !!(lim && lim.tools); } catch (e) { toolsOK = false; }
+  }
+  if (!sampleFn) disableAsk("Conversation isn't available in this view. Briefings and project briefs still work.");
+  return sampleFn;
+}
+function disableAsk(msg) {
+  $("#ask-input").disabled = true; $("#ask-send").disabled = true;
+  $$(".prompt").forEach(b => b.disabled = true);
+  const n = $("#ask-note"); n.textContent = msg; n.hidden = false;
+}
+function registrySnapshot() {
+  return sorted(projects).map(p => ({
+    id: p.id, name: p.name, category: p.category || "", where: p.org || "", status: p.status,
+    mission: p.mission || "", components: p.components, flags: p.flags, next_action: p.next || "",
+    due: p.due || "", days_until_due: p.due ? daysUntil(p.due) : null,
+    progress_percent: p.progress, notes: (p.notes || "").slice(-600)
+  }));
+}
+function rules(withTools) {
+  const nm = settings.name || "ASTRA", cs = settings.callsign || "the user";
+  return [
+    "You are " + nm + ", the voice assistant built into " + cs + "'s personal project command deck. Personality: a calm, sharp AI copilot with warmth and a light, dry wit. Confident and direct, never gushing, never sycophantic.",
+    "Your replies are read aloud by text-to-speech and shown as captions, so write plain spoken sentences only: no markdown, lists, bullet symbols, headings, emoji or links. Keep it to one to four sentences unless he asks for a plan or summary, and even then stay under 120 words. Say numbers and dates the way a person would say them.",
+    "Ground every claim in the project registry, checklist and daily log entries that come with each message. If something isn't there, say you don't have that yet and suggest he add it. Never invent deadlines, progress, results or people.",
+    withTools
+      ? "You can change project cards with the update_project tool and the checklist with the update_checklist tool. Use them only when he clearly asks you to change, set, mark, add, check off, log or note something. After a change, confirm in one sentence what you changed."
+      : "You can't change the deck from here. If he asks you to, tell him to use the card's Edit button or the checklist directly.",
+    "Today is " + fmtLong(new Date()) + "."
+  ].join("\n\n");
+}
+const updateTool = {
+  name: "update_project",
+  description: "Change fields on one project in the registry. Use only when the user explicitly asks to change, set, mark, log or note something. Returns the list of changes made.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "The project's id, exactly as given in the registry." },
+      status: { type: "string", enum: STATUS_ORDER, description: "New status." },
+      next_action: { type: "string", description: "New next action. Empty string clears it." },
+      due: { type: "string", description: "Due date as YYYY-MM-DD. Empty string clears it." },
+      progress_percent: { type: "number", description: "0 to 100." },
+      note: { type: "string", description: "A short line to append to the project's notes." }
+    },
+    required: ["id"]
+  },
+  async execute(input) {
+    const id = String(input.id || "");
+    const p = projects.find(x => x.id === id);
+    if (!p) throw new Error("No project with id '" + id + "'. Valid ids: " + projects.map(x => x.id).join(", "));
+    if (!db || canWrite === false) throw new Error("The registry is read-only for this viewer.");
+    const patch = {}, changes = [];
+    if (input.status != null && input.status !== "") {
+      const s = String(input.status).toLowerCase();
+      if (!STATUS[s]) throw new Error("status must be one of " + STATUS_ORDER.join(", "));
+      patch.status = s; changes.push("status → " + STATUS[s].label);
+    }
+    if (input.next_action != null) { patch.next = String(input.next_action).slice(0, 220); changes.push(patch.next ? "next action set" : "next action cleared"); }
+    if (input.due != null) {
+      const d = String(input.due).trim();
+      if (d && !parseISO(d)) throw new Error("due must be YYYY-MM-DD, or empty to clear");
+      patch.due = d || null; changes.push(d ? "due " + fmtShort(d) : "due date cleared");
+    }
+    if (input.progress_percent != null && input.progress_percent !== "") {
+      const n = Number(input.progress_percent);
+      if (!isFinite(n)) throw new Error("progress_percent must be a number from 0 to 100");
+      patch.progress = Math.max(0, Math.min(100, Math.round(n))); changes.push("progress " + patch.progress + "%");
+    }
+    if (input.note) { patch.notes = (p.notes ? p.notes + "\n" : "") + isoToday() + ": " + String(input.note).slice(0, 300); changes.push("note added"); }
+    if (!changes.length) throw new Error("Nothing to change: pass at least one field besides id.");
+    patch.updatedAt = new Date().toISOString();
+    try { await db.doc("projects/" + id).update(patch); }
+    catch (e) { throw new Error(e && e.code === "invalid_argument" ? "This viewer can't write to the registry." : "The registry didn't accept the change. Try again in a moment."); }
+    addTurn("sys", p.name + ": " + changes.join(", "));
+    return { ok: true, project: p.name, changes };
+  }
+};
+function errorCopy(code) {
+  switch (code) {
+    case "rate_limited": return "Too many requests just now. Give it a minute and ask again.";
+    case "session_expired": return "Your claude.ai session expired. Sign in again to keep talking.";
+    case "refused": return "I can't help with that one. Try asking another way.";
+    case "prompt_too_large": return "That's more than I can read at once. Try a shorter question.";
+    case "empty_completion": return "I came up empty on that. Try rephrasing.";
+    default: return "The link dropped before I could answer. Ask again.";
+  }
+}
+async function ask(q) {
+  q = q.trim(); if (!q) return;
+  const fn = await ensureSample();
+  if (!fn) return;
+  addTurn("you", q);
+  const bubble = addTurn("ai", "Thinking…");
+  if (askCtl) askCtl.abort();
+  const ctl = new AbortController(); askCtl = ctl;
+  sayBegin(); setState("thinking");
+  $("#ask-send").disabled = true;
+  const withTools = toolsOK && !!db && canWrite !== false;
+  const content = "Project registry (JSON):\n" + JSON.stringify(registrySnapshot()) +
+    "\n\nChecklist (JSON):\n" + JSON.stringify(checklistSnapshot()) +
+    "\n\nRecent daily log entries (JSON):\n" + JSON.stringify(logSnapshot()) +
+    "\n\n" + (settings.callsign || "He") + " says: " + q;
+  const input = [{ role: "user", content: rules(withTools) }].concat(history.slice(-8), [{ role: "user", content }]);
+  let spokenTo = 0, latest = "";
+  const flushSentences = (text, final) => {
+    const re = /[.!?…](?=["”')\]]?\s)|\n/g; re.lastIndex = spokenTo;
+    let m, from = spokenTo;
+    while ((m = re.exec(text))) { const end = m.index + 1; const s = text.slice(from, end).trim(); if (s) sayPush(s); from = end; }
+    if (final) { const s = text.slice(from).trim(); if (s) sayPush(s); from = text.length; }
+    spokenTo = from;
+  };
+  try {
+    const opts = { modelTier: "quick", signal: ctl.signal, onText: ({ text }) => { latest = text; bubble.textContent = text; flushSentences(text, false); } };
+    if (withTools) opts.tools = [updateTool, checklistTool]; else opts.cache = false;
+    const res = await fn(input, opts);
+    latest = res.text; bubble.textContent = res.text;
+    flushSentences(res.text, true);
+    history.push({ role: "user", content: q }, { role: "assistant", content: res.text });
+    if (history.length > 12) history = history.slice(-12);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "cancelled") { bubble.textContent = (e.text || latest || "") + (e.text || latest ? " …" : "Stopped."); }
+    else if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+      bubble.parentElement.remove();
+      disableAsk("Conversation is off for this page, so she can't answer questions here. Briefings and project briefs still work.");
+    } else if (code === "tools_unavailable") {
+      toolsOK = false; bubble.textContent = "I lost write access to the registry for a moment. Ask once more and I'll answer without changing anything.";
+    } else {
+      const msg = errorCopy(code);
+      bubble.textContent = (code !== "refused" && e && e.text ? e.text + " " : "") + msg;
+      bubble.parentElement.classList.add("err");
+      if (code !== "refused") sayPush(msg); else { sayBegin(); sayPush(msg); }
+    }
+  } finally {
+    if (askCtl === ctl) askCtl = null;
+    $("#ask-send").disabled = $("#ask-input").disabled;
+    sayEnd();
+  }
+}
+$("#ask-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const inp = $("#ask-input"); const q = inp.value; inp.value = "";
+  ask(q);
+});
+$$(".prompt").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
+ensureSample();
+
+/* ---------- editor drawer ---------- */
+let editing = null; // project id, or "" for new
+let lastFocus = null;
+function openDrawer(d) {
+  lastFocus = document.activeElement;
+  $("#scrim").hidden = false; d.hidden = false;
+  const f = d.querySelector("input, select, textarea"); if (f) f.focus();
+}
+function closeDrawers() {
+  $$(".drawer").forEach(d => d.hidden = true);
+  $("#scrim").hidden = true;
+  editing = null;
+  if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+}
+$$("[data-close]").forEach(b => b.addEventListener("click", closeDrawers));
+$("#scrim").addEventListener("click", closeDrawers);
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#scrim").hidden) closeDrawers();
+  else if (core.state !== "standby") sayStop();
+});
+
+function openEditor(id) {
+  if (!db || canWrite === false) return;
+  const p = id ? projects.find(x => x.id === id) : null;
+  editing = p ? p.id : "";
+  $("#edit-eyebrow").textContent = p ? "Edit project" : "New project";
+  $("#edit-title").textContent = p ? p.name : "Add to the registry";
+  $("#f-name").value = p ? p.name : "";
+  $("#f-cat").value = p ? (p.category || "") : "";
+  $("#f-status").value = p ? p.status : "active";
+  $("#f-org").value = p ? (p.org || "") : "";
+  $("#f-mission").value = p ? (p.mission || "") : "";
+  $("#f-next").value = p ? p.next : "";
+  $("#f-due").value = p && p.due ? p.due : "";
+  $("#f-progress").value = p && p.progress != null ? String(p.progress) : "";
+  $("#f-systems").value = p ? p.components.join("\n") : "";
+  $("#f-flags").value = p ? p.flags.join("\n") : "";
+  $("#f-notes").value = p ? p.notes : "";
+  $("#f-delete").hidden = !p;
+  $("#delete-confirm").hidden = true;
+  $("#save-msg").textContent = ""; $("#save-msg").classList.remove("bad");
+  openDrawer($("#edit-drawer"));
+}
+function lines(v) { return String(v || "").split("\n").map(s => s.trim()).filter(Boolean).slice(0, 20); }
+function slug(s) { return (String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "project") + "-" + Math.random().toString(36).slice(2, 6); }
+$("#edit-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!db) return;
+  const msg = $("#save-msg");
+  const prog = $("#f-progress").value.trim();
+  const data = {
+    name: $("#f-name").value.trim() || "Untitled project",
+    category: $("#f-cat").value.trim(),
+    status: $("#f-status").value,
+    org: $("#f-org").value.trim(),
+    mission: $("#f-mission").value.trim(),
+    next: $("#f-next").value.trim(),
+    due: $("#f-due").value || null,
+    progress: prog === "" ? null : Math.max(0, Math.min(100, Math.round(Number(prog) || 0))),
+    components: lines($("#f-systems").value),
+    flags: lines($("#f-flags").value),
+    notes: $("#f-notes").value,
+    updatedAt: new Date().toISOString()
+  };
+  $("#f-save").disabled = true; msg.textContent = "Saving…"; msg.classList.remove("bad");
+  try {
+    if (editing) await db.doc("projects/" + editing).update(data);
+    else {
+      data.order = projects.reduce((m, p) => Math.max(m, p.order < 99 ? p.order : 0), 0) + 1;
+      await db.collection("projects").doc(slug(data.name)).set(data);
+    }
+    msg.textContent = "Saved";
+    setTimeout(closeDrawers, 350);
+  } catch (err) {
+    msg.classList.add("bad");
+    if (err && err.code === "invalid_argument") { msg.textContent = "You can view this deck but not change it."; canWrite = false; render(); }
+    else if (err && err.code === "quota_exceeded") msg.textContent = "The registry is full. Delete a project first.";
+    else msg.textContent = "Didn't save. Check your connection and try again.";
+  } finally { $("#f-save").disabled = false; }
+});
+$("#f-delete").addEventListener("click", () => { $("#delete-confirm").hidden = false; $("#f-delete-yes").focus(); });
+$("#f-delete-no").addEventListener("click", () => { $("#delete-confirm").hidden = true; });
+$("#f-delete-yes").addEventListener("click", async () => {
+  if (!db || !editing) return;
+  try { await db.doc("projects/" + editing).delete(); closeDrawers(); }
+  catch (err) { const m = $("#save-msg"); m.classList.add("bad"); m.textContent = "Didn't delete. Try again."; }
+});
+$("#add-btn").addEventListener("click", () => openEditor(null));
+
+/* ---------- settings drawer ---------- */
+function syncSettingsForm() {
+  $("#s-name").value = settings.name; $("#s-callsign").value = settings.callsign;
+  $("#s-rate").value = settings.rate; $("#s-pitch").value = settings.pitch; $("#s-mute").checked = !!settings.mute;
+  $("#s-rate-val").textContent = Number(settings.rate).toFixed(2) + "×";
+  $("#s-pitch-val").textContent = Number(settings.pitch).toFixed(2);
+  populateVoiceSelect();
+}
+$("#open-settings").addEventListener("click", () => { syncSettingsForm(); openDrawer($("#settings-drawer")); });
+$("#settings-form").addEventListener("submit", e => e.preventDefault());
+$("#s-name").addEventListener("input", e => { settings.name = e.target.value.trim() || "ASTRA"; local.set("name", settings.name); applyNames(); });
+$("#s-callsign").addEventListener("input", e => { settings.callsign = e.target.value.trim(); local.set("callsign", settings.callsign); });
+$("#s-voice").addEventListener("change", e => { settings.voiceURI = e.target.value; local.set("voiceURI", settings.voiceURI); updateVoiceLabel(); });
+$("#s-rate").addEventListener("input", e => { settings.rate = Number(e.target.value); $("#s-rate-val").textContent = settings.rate.toFixed(2) + "×"; local.set("rate", settings.rate); });
+$("#s-pitch").addEventListener("input", e => { settings.pitch = Number(e.target.value); $("#s-pitch-val").textContent = settings.pitch.toFixed(2); local.set("pitch", settings.pitch); });
+$("#s-mute").addEventListener("change", e => { settings.mute = e.target.checked; local.set("mute", settings.mute); updateVoiceLabel(); setState(core.state); });
+$("#s-test").addEventListener("click", () => {
+  sayBegin(); sayPush((settings.name || "ASTRA") + " online. All systems nominal, " + (settings.callsign || "boss") + ". Say the word and I'll run the board."); sayEnd();
+});
+
+/* ---------- capabilities: registry + write access ---------- */
+setState("standby");
+(async () => {
+  if (!window.claude || typeof window.claude.use !== "function") { db = false; render(); return; }
+  claude.use("user").then(async u => {
+    if (!u) return;
+    try { canWrite = await u.can("data.write"); } catch (e) { canWrite = null; }
+    $("#ro-badge").hidden = canWrite !== false;
+    $("#add-btn").hidden = canWrite === false;
+    render();
+  });
+  const store = await claude.use("db");
+  if (!store) { db = false; $("#add-btn").hidden = true; render(); return; }
+  db = store;
+  db.collection("projects").onSnapshot(snap => {
+    projects = snap.docs.map(d => normalize(d.id, d.data()));
+    loaded = true;
+    render();
+  }, err => {
+    if (!loaded) { db = false; render(); }
+  });
+  db.collection("checklist").onSnapshot(snap => {
+    checklist = snap.docs.map(d => normCheck(d.id, d.data()));
+    checkLoaded = true;
+    renderChecklist();
+  }, err => {
+    if (!checkLoaded) { checkLoaded = true; checklist = []; renderChecklist(); checkNote("The checklist didn't load. Reload the page to try again."); }
+  });
+  db.collection("log").orderBy("date", "desc").limit(60).onSnapshot(snap => {
+    logs = snap.docs.map(d => normLog(d.id, d.data()));
+    logLoaded = true;
+    renderLog();
+  }, err => {
+    if (!logLoaded) { logLoaded = true; logs = []; renderLog(); }
+  });
+})();
+render();
+})();
+</script>
+
+</body></html>
