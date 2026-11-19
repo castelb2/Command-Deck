@@ -142,9 +142,11 @@
     });
     return items;
   }
-  function nextId(items, prefix, width) {
+  // Next free ID. IDs are never reused: anything named in the deletion log ("R-005: …") counts as taken.
+  function nextId(items, prefix, width, alsoTaken) {
     let n = 0;
-    (items || []).forEach(it => { const m = new RegExp("^" + prefix + "(\\d+)$").exec(it.id || ""); if (m) n = Math.max(n, +m[1]); });
+    const re = new RegExp("^" + prefix + "(\\d+)\\b");
+    (items || []).map(it => it.id || "").concat(alsoTaken || []).forEach(s => { const m = re.exec(String(s)); if (m) n = Math.max(n, +m[1]); });
     return prefix + pad(n + 1, width);
   }
   function method(v) {
@@ -227,8 +229,8 @@
     raw = isObj(raw) ? raw : {};
     const se = blank();
     se.phase = int(raw.phase, 0, 5) || 0;
-    se.criteria = list(raw.criteria, LIMITS.criteria, cleanCriterion);
-    se.criteria.forEach((c, i) => { c.id = "SC" + (i + 1); });
+    // Criterion IDs stay put when one is removed, so requirement trace links don't shift.
+    se.criteria = uniqueIds(list(raw.criteria, LIMITS.criteria, cleanCriterion), "SC", 1);
     const done = Array.isArray(raw.done) ? raw.done : Array.isArray(raw.checklistDone) ? raw.checklistDone : [];
     se.done = Array.from(new Set(done.map(x => str(x, 40)).filter(x => CHECK_IDS.has(x))));
     const g = isObj(raw.gates) ? raw.gates : {};

@@ -1,0 +1,103 @@
+{
+  "app": "command-deck",
+  "version": 1,
+  "exportedAt": "2026-11-19T08:00:00.000Z",
+  "collections": {
+    "projects": {
+      "shelf-build-a1b2": {
+        "name": "Garage shelving",
+        "category": "Home",
+        "status": "active",
+        "org": "Garage",
+        "mission": "Get the tools off the floor.",
+        "next": "Buy brackets",
+        "due": "2027-01-10",
+        "progress": 40,
+        "components": ["Brackets", "Boards"],
+        "flags": [],
+        "notes": "",
+        "order": 1
+      },
+      "thruster-stand-c3d4": {
+        "name": "Cold-gas thruster test stand",
+        "category": "Research",
+        "status": "active",
+        "org": "Propulsion lab",
+        "mission": "Measure the thrust of a COTS CO2 cold-gas valve to within 5% so a capsule controller can be sized from data, not guesses.",
+        "next": "Calibrate the load cell",
+        "due": "2027-02-20",
+        "components": ["Load cell", "Valve", "DAQ"],
+        "flags": ["Load cell drifts with temperature"],
+        "notes": "",
+        "order": 2,
+        "tier": "blackswan",
+        "se": {
+          "phase": 2,
+          "criteria": [
+            { "id": "SC1", "text": "Thrust measured within ±5% of a reference weight", "met": false },
+            { "id": "SC2", "text": "Ten firings logged without a leak", "met": false },
+            { "id": "SC3", "text": "Data exported to the controller sizing script", "met": false }
+          ],
+          "done": ["P0.mission", "P0.criteria", "P0.stakeholders", "P0.conops", "P0.owners", "P1.shall", "P1.interrogate", "P1.delete", "P1.alternatives", "P1.trade", "P1.risks", "P1.doors", "P2.riskfirst"],
+          "gates": {
+            "G0": { "status": "pass", "date": "2026-10-02", "note": "Worth doing: unblocks thruster sizing", "reviewers": "Advisor" },
+            "G1": { "status": "pass", "date": "2026-10-20", "note": "", "reviewers": "Advisor", "reqCount": 6 }
+          },
+          "requirements": [
+            { "id": "R-001", "text": "The stand shall measure thrust from 0 to 5 N within ±5%", "owner": "Alex", "origin": "stakeholder", "parent": "SC1", "method": "T", "interrogation": [true, true, true, true, true, true, true], "result": "" },
+            { "id": "R-002", "text": "The stand shall log at 1 kHz", "owner": "Alex", "origin": "physics", "parent": "SC1", "method": "A", "interrogation": [true, true, true, true, true, true, true], "result": "pass" },
+            { "id": "R-003", "text": "The plumbing shall hold 60 bar without leaking", "owner": "Alex", "origin": "regulation", "parent": "SC2", "method": "T", "interrogation": [true, true, true, true, true, true, true], "result": "" },
+            { "id": "R-004", "text": "The stand shall export CSV", "owner": "Alex", "origin": "stakeholder", "parent": "SC3", "method": "D", "interrogation": [true, true, true, true, true, true, true], "result": "pass" },
+            { "id": "R-005", "text": "The frame shall be anodized", "owner": "", "origin": "habit", "parent": "SC2", "method": "I", "interrogation": [true, false, false, false, false, false, false], "result": "" }
+          ],
+          "risks": [
+            { "id": "RK-01", "title": "If the load cell drifts with temperature, then thrust error exceeds 5%", "likelihood": 4, "consequence": 4, "mitigation": "Thermal soak before each run", "owner": "Alex", "status": "open" },
+            { "id": "RK-02", "title": "If the regulator freezes, then firings cut short", "likelihood": 3, "consequence": 2, "mitigation": "", "owner": "Alex", "status": "open" }
+          ],
+          "budgets": [
+            { "name": "Cost", "unit": "USD", "limit": 600, "current": 520, "target": 20 },
+            { "name": "Mass", "unit": "kg", "limit": 10, "current": 6.5, "target": 20 }
+          ],
+          "interfaces": [
+            { "from": "Load cell", "to": "DAQ", "what": "Analog 0–10 mV" }
+          ],
+          "tests": [
+            { "date": "2026-11-02", "what": "Dry fit of the frame", "result": "pass", "cycleDays": 3 },
+            { "date": "2026-11-09", "what": "First cold firing, no data", "result": "fail", "cycleDays": 5 },
+            { "date": "2026-11-15", "what": "Second firing with DAQ", "result": "data", "cycleDays": 4 }
+          ],
+          "deletions": [
+            { "date": "2026-10-15", "item": "Second sensor board", "kind": "part", "reason": "DAQ has spare channels", "addedBack": false },
+            { "date": "2026-10-15", "item": "Weekly status meeting", "kind": "meeting", "reason": "Log replaces it", "addedBack": false },
+            { "date": "2026-10-18", "item": "Custom valve manifold", "kind": "part", "reason": "COTS tee works", "addedBack": true }
+          ],
+          "lessons": [],
+          "parts": 34,
+          "variants": 7
+        }
+      },
+      "recovery-beacon-e5f6": {
+        "name": "Rocket recovery beacon",
+        "category": "Hobby",
+        "status": "planning",
+        "mission": "Find the rocket after it lands, every time.",
+        "next": "Order the GPS module",
+        "due": "2027-03-05",
+        "components": [],
+        "flags": [],
+        "notes": "",
+        "order": 3,
+        "tier": "weekend",
+        "se": { "phase": 0, "criteria": [], "done": [] }
+      }
+    },
+    "checklist": {
+      "c1": { "text": "Stretch", "daily": true, "done": false, "doneOn": null, "order": 1 },
+      "c2": { "text": "Email the lab manager", "daily": false, "done": false, "doneOn": null, "order": 2 }
+    },
+    "log": {
+      "2026-11-18": { "date": "2026-11-18", "title": "Test stand day", "summary": "Second firing logged.", "highlights": [] }
+    }
+  },
+  "settings": {}
+}

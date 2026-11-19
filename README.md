@@ -17,6 +17,24 @@ The original deck on claude.ai is untouched. This repository holds the app only.
 
 For better speech, download an Enhanced voice in iPhone Settings > Accessibility > Spoken Content > Voices, then pick it in the deck's Settings.
 
+## Tiered projects: Weekend, Black Swan, NASA
+
+Any project on the board can run on the Lean Systems Engineering framework: NASA's phases and gates, with Musk's five steps inside each phase. Pick the rigor to match the consequence of failure:
+
+| Type | Scale | Gates | Paperwork |
+|---|---|---|---|
+| **Weekend** | Small: class project, weekend build | G1 SRR, G4 ORR/FRR | One-page requirements and a test log |
+| **Black Swan** | Medium: thesis, student payload | G0–G4, lightweight | Requirements, risk and verification matrices, ICD |
+| **NASA** | Large: funded, flight, safety-critical | G0–G4, full, with named external reviewers | Full set: SEMP, ICDs, hazard analysis |
+
+- **Make one.** Edit a project (or Add project), then pick a **Project type**. The card gains a tier badge, its phase, next-gate readiness and a gate track. Tap it to open the mission dashboard.
+- **The dashboard.** It shows the phase track (tap a phase to see its checklist; tap a gate to review it), the Musk steps that run in the current phase, alerts the project raises from its own evidence, and the framework's metrics: requirements, % verified, red risks, tightest margin, cycle time and deletion add-back. Tabs hold the checklist, requirements (with the 7-question interrogation and verification method and result), the 5×5 risk register, budgets, interfaces and parts count, the test log, the deletion log and lessons. Weekend projects get the lighter set.
+- **Gates.** Readiness is computed from the project itself. Going ahead with unmet checks needs a written waiver, and the card then shows "passed on a waiver". NASA gates need the reviewers' names. A Go moves the project to the next phase.
+- **Progress** is computed from the checklists and gates, so tiered projects have no typed progress field.
+- **From a Claude project.** In the Claude project, ask for a status card (the `deck-status-card` skill in [`skills/`](skills/deck-status-card/SKILL.md) writes one), copy it, then tap **Import card** on the board and paste. You see a preview, and nothing changes until **Apply**. **Copy card** in a dashboard goes the other way: paste it into the project's Claude chat, ask for an update, and import the result. The format is in [`docs/status-card.md`](docs/status-card.md).
+
+How this feature was built, with its requirements (R13–R23), deletion review and verification, is in [`docs/tiered-projects.md`](docs/tiered-projects.md).
+
 ## What works without a key, and what needs one
 
 | Works offline, no key | Needs an Anthropic API key |
@@ -51,7 +69,15 @@ For better speech, download an Enhanced voice in iPhone Settings > Accessibility
 | `manifest.webmanifest` | App name, colours, icons, full-screen display |
 | `sw.js` | Service worker: caches the app and fonts so it opens offline |
 | `icons/` | Home Screen and app icons (made by `tools/make_icons.py`) |
+| `js/se-model.js` | The Lean SE framework as data: tiers, phases, gates, checklists, metrics, status-card cleaning |
+| `js/se-ui.js` | Mission dashboard, card extras and the status-card import drawer |
+| `docs/status-card.md` | The status-card format (the interface to Claude projects) |
+| `docs/tiered-projects.md` | Build record for tiered projects: requirements, deletions, verification, lessons |
+| `skills/deck-status-card/SKILL.md` | The Claude skill that writes status cards |
 | `tools/test_iphone.mjs` | Headless test at iPhone sizes |
+| `tools/test_tiers.mjs` | Headless test of the tiered dashboards at iPhone sizes |
+| `tools/test_se_model.mjs` | Unit checks for the framework model (Node, no browser) |
+| `tools/fixtures/sample-backup.json` | Invented projects for the tests (no personal data) |
 | `DELETE_LOG.md` | What was removed from the original and why |
 
 ## Requirements (Lean Systems Engineering)
@@ -109,6 +135,8 @@ Run on 2026-11-19 with `node tools/test_iphone.mjs <chromium> <backup.json> <out
 - [ ] Airplane mode: the app still opens with the board (R2)
 - [ ] Run briefing speaks after the first tap (R7)
 - [ ] Import works from the Files app inside the installed app (R4)
+
+**Tiered projects, 2026-11-19:** 40 of 40 model checks, 78 of 78 tier checks at both sizes, and the 40 checks above again (`node tools/test_iphone.mjs <chrome> tools/fixtures/sample-backup.json <out-dir>`). The details are in [`docs/tiered-projects.md`](docs/tiered-projects.md#phase-4--verification-prove). Playwright: `npm i playwright-core` (or link it into `node_modules/`, which git ignores).
 
 ## Updating
 
