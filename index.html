@@ -1959,7 +1959,7 @@ function primeSpeech() {
 ["touchend", "click", "keydown"].forEach(ev => document.addEventListener(ev, primeSpeech, { capture: true, passive: true }));
 
 /* ---------- Home Screen app: offline shell + update prompt ---------- */
-if ("serviceWorker" in navigator && location.protocol === "https:") {
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(reg => {
       const offer = w => {
