@@ -1,6 +1,24 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.anthropic.com https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; worker-src 'self'">
 <title>Bryaninho Command Deck</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Personal ops grid: projects, checklist, daily log and a voice assistant.">
+<meta name="theme-color" content="#03080E">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Command Deck">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>html,body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}*,*::before,*::after{box-sizing:border-box}</style>
+<script src="js/local-db.js"></script>
+<script src="js/ai.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -138,7 +156,7 @@ h2{font-size:20px;letter-spacing:.06em;text-transform:uppercase}
 .turn.err .txt{color:var(--amber)}
 .ask{display:flex;gap:8px}
 .ask input{flex:1;min-width:0}
-input[type="text"],input[type="date"],input[type="number"],select,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line-2);color:var(--ink);padding:10px 12px;border-radius:0;font-size:15px;width:100%;box-sizing:border-box}
+input[type="text"],input[type="password"],input[type="date"],input[type="number"],select,textarea{background:rgba(0,0,0,.35);border:1px solid var(--line-2);color:var(--ink);padding:10px 12px;border-radius:0;font-size:15px;width:100%;box-sizing:border-box}
 input::placeholder,textarea::placeholder{color:var(--ink-3)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--holo);box-shadow:0 0 0 3px rgba(79,216,255,.15)}
 textarea{resize:vertical;line-height:1.45}
@@ -317,11 +335,43 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
   .horizon-list li .s{display:none}
   .clock{text-align:left}
 }
+/* iPhone Home Screen app: safe areas, no zoom-on-focus, thumb-size targets */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.shell{padding-top:max(20px, calc(env(safe-area-inset-top, 0px) + 12px));padding-bottom:max(56px, calc(env(safe-area-inset-bottom, 0px) + 32px))}
+.drawer{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.form .group{display:grid;gap:12px;padding-top:16px;margin-top:4px;border-top:1px dashed var(--line)}
+.form .group > .eyebrow{margin-bottom:-4px}
+.key-state{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+.key-state.on{color:var(--ok)}
+.file-pick{position:relative;overflow:hidden}
+.file-pick input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.update-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(16px, calc(env(safe-area-inset-bottom, 0px) + 10px));z-index:60;display:flex;gap:10px;align-items:center;
+  padding:10px 12px;background:var(--deck);border:1px solid var(--holo);box-shadow:0 10px 30px rgba(0,0,0,.5);font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;max-width:calc(100% - 32px)}
+@media (pointer: coarse){
+  input[type="text"],input[type="password"],input[type="date"],input[type="number"],select,textarea{font-size:16px}
+  .btn{min-height:44px}
+  .btn.sm{min-height:38px;padding:8px 12px}
+  .filter,.prompt,.log-day{min-height:40px}
+  .linkish{min-height:40px;padding:10px 0}
+  .check-box{width:26px;height:26px}
+  .check-del{min-height:36px;padding:6px 8px}
+  .daily-toggle{min-height:44px}
+  .daily-toggle input{width:20px;height:20px}
+}
+@media (max-width: 430px){
+  .topbar-meta{width:100%;justify-content:space-between}
+  .core-actions .btn{flex:1}
+  .ask .btn{padding-inline:12px}
+}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .sweep{display:none}
 }
 </style>
+</head>
+<body>
 
 <div class="atmo" aria-hidden="true"></div>
 <div class="sweep" aria-hidden="true"></div>
@@ -338,7 +388,7 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
     <div class="topbar-meta">
       <div class="clock" aria-label="Current time"><span id="clock-time">--:--:--</span><span id="clock-date">—</span></div>
       <span class="chip" id="voice-chip" data-state="idle">Voice standby</span>
-      <button class="btn" id="open-settings" type="button" aria-haspopup="dialog">Voice settings</button>
+      <button class="btn" id="open-settings" type="button" aria-haspopup="dialog">Settings</button>
     </div>
   </header>
 
@@ -426,7 +476,7 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
     </div>
 
     <div class="panel log-panel">
-      <div class="panel-label"><span>Daily log</span><span>New entry nightly · 11:59 PM</span></div>
+      <div class="panel-label"><span>Daily log</span><span>Saved on this phone</span></div>
       <div class="log-days" id="log-days" role="tablist" aria-label="Log entries by day"></div>
       <div class="log-body" id="log-body" aria-live="polite"></div>
       <div class="log-notes" id="log-notes-wrap" hidden>
@@ -509,7 +559,7 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
 
 <aside class="drawer" id="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
   <div class="drawer-head">
-    <div><div class="eyebrow">Assistant</div><h2 id="settings-title">Voice settings</h2></div>
+    <div><div class="eyebrow">Assistant · AI link · Data</div><h2 id="settings-title">Settings</h2></div>
     <button class="btn ghost" type="button" data-close>Close</button>
   </div>
   <form class="form" id="settings-form" autocomplete="off">
@@ -527,7 +577,36 @@ input[type="range"]{width:100%;accent-color:var(--holo)}
     <div class="drawer-actions">
       <button class="btn primary" type="button" id="s-test">Test voice</button>
     </div>
-    <p class="hint">Voices come from your device and browser, so the list on your laptop and your phone will differ. Natural or Neural voices (Edge and Windows) and Premium or Enhanced voices (Mac and iPhone) sound the smoothest. These settings stay on this device.</p>
+    <p class="hint">Voices come from your device and browser, so the list on your laptop and your phone will differ. Natural or Neural voices (Edge and Windows) and Premium or Enhanced voices (Mac and iPhone) sound the smoothest. On iPhone, download Enhanced voices in Settings › Accessibility › Spoken Content › Voices. These settings stay on this device.</p>
+
+    <div class="group" aria-labelledby="ai-title">
+      <div class="eyebrow" id="ai-title">AI link</div>
+      <p class="hint">Without a key, <span class="js-ai-name">ASTRA</span> runs offline: briefings, project briefs and quick questions about your deadlines, flags, checklist and log all work. Add your own Claude API key for open-ended questions and for letting her change the board when you ask.</p>
+      <label for="s-key">Claude API key <small>from console.anthropic.com</small><input id="s-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" inputmode="text"></label>
+      <div class="drawer-actions">
+        <button class="btn primary sm" type="button" id="s-key-save">Save key</button>
+        <button class="btn danger sm" type="button" id="s-key-clear">Remove key</button>
+        <span class="key-state" id="s-key-state" role="status"></span>
+      </div>
+      <label for="s-model">Model<select id="s-model"></select></label>
+      <p class="hint">Your key stays on this phone. It is saved only in this app's storage and sent only to api.anthropic.com, never to GitHub or anyone else, and it is left out of backups. Anyone using this unlocked phone could use it, so set a monthly spend limit in the Anthropic Console.</p>
+    </div>
+
+    <div class="group" aria-labelledby="data-title">
+      <div class="eyebrow" id="data-title">Data</div>
+      <p class="hint">Projects, checklist and log live on this phone only. Export a backup now and then, and import one to move your board to another device.</p>
+      <div class="drawer-actions">
+        <button class="btn sm" type="button" id="d-export">Export backup</button>
+        <span class="btn sm file-pick">Import backup<input id="d-import" type="file" accept="application/json,.json" aria-label="Import backup file"></span>
+        <button class="btn danger sm" type="button" id="d-clear">Erase board</button>
+      </div>
+      <div class="confirm" id="d-clear-confirm" hidden>
+        <span>Erase every project, checklist item and log entry on this phone?</span>
+        <button class="btn danger sm" type="button" id="d-clear-yes">Erase</button>
+        <button class="btn sm" type="button" id="d-clear-no">Keep it</button>
+      </div>
+      <span class="save-msg" id="d-msg" role="status"></span>
+    </div>
   </form>
 </aside>
 
@@ -582,8 +661,7 @@ let canWrite = null;       // null = not told; false = read-only
 let filter = "all";
 let history = [];          // chat turns for the assistant
 let askCtl = null;
-const samplePromise = (window.claude && typeof window.claude.use === "function") ? window.claude.use("sample") : Promise.resolve(null);
-let sampleFn = null, toolsOK = false, sampleChecked = false;
+let sampleFn = null, toolsOK = false;
 let checklist = [], checkLoaded = false, logs = [], logLoaded = false, selectedDay = null, showDone = false;
 const writeChain = new Map();
 const core = { cv: $("#core"), ctx: null, size: 0, level: 0.06, kick: 0, state: "standby", t0: performance.now(), raf: 0 };
@@ -677,14 +755,14 @@ function renderGrid() {
   if (!loaded) {
     const s = el("div", "grid-state");
     s.append(el("strong", "dots", db === false ? "Registry offline" : "Syncing project registry"));
-    s.append(el("span", null, db === false ? "Your projects are stored with this page on claude.ai. Open it while signed in to load them." : "Your projects load here in a moment."));
+    s.append(el("span", null, db === false ? "This browser is blocking storage, so the board can't load. Turn off Private Browsing and reopen the app." : "Your projects load here in a moment."));
     grid.append(s); return;
   }
   const list = sorted(projects.filter(p => filter === "all" || p.status === filter));
   if (!list.length) {
     const s = el("div", "grid-state");
     s.append(el("strong", null, projects.length ? "Nothing in this filter" : "Registry is empty"));
-    s.append(el("span", null, projects.length ? "Pick another status above." : "Add your first project and your assistant starts tracking it."));
+    s.append(el("span", null, projects.length ? "Pick another status above." : "Add your first project, or import a backup from Settings."));
     if (!projects.length && canWrite !== false && db) { const b = el("button", "btn primary", "Add project"); b.type = "button"; b.addEventListener("click", () => openEditor(null)); s.append(b); }
     grid.append(s); return;
   }
@@ -841,7 +919,7 @@ function renderChecklist() {
   const writable = canEditData();
   $("#check-form").hidden = !writable;
   if (!checkLoaded) {
-    dl.append(el("li", "check-empty", db === false ? "Checklist offline. Open this page signed in to claude.ai." : "Loading…"));
+    dl.append(el("li", "check-empty", db === false ? "Checklist unavailable: this browser is blocking storage." : "Loading…"));
     $("#check-count").textContent = "—"; $("#check-show-done").hidden = true; meter.hidden = true; return;
   }
   const t = isoToday();
@@ -954,7 +1032,7 @@ function renderLog() {
   const days = $("#log-days"), body = $("#log-body"), wrap = $("#log-notes-wrap");
   days.textContent = ""; body.textContent = "";
   if (!logLoaded) {
-    body.append(logEmpty(db === false ? "Log offline" : "Loading the log", db === false ? "Open this page signed in to claude.ai to see your entries." : ""));
+    body.append(logEmpty(db === false ? "Log offline" : "Loading the log", db === false ? "This browser is blocking storage." : ""));
     wrap.hidden = true; return;
   }
   const list = logDays();
@@ -987,8 +1065,8 @@ function renderLog() {
   if (meta.length) head.append(el("div", "log-meta", meta.join(" · ")));
   body.append(head);
   if (!hasBody(e)) {
-    body.append(logEmpty(isToday ? "Tonight's entry lands at 11:59 PM" : "Nothing was logged this day",
-      isToday ? (settings.name || "ASTRA") + " writes it from your Claude conversations, the pages and files you made, your calendar and this checklist. Add your own notes below anytime." : ""));
+    body.append(logEmpty(isToday ? "Today, nothing logged yet" : "Nothing was logged this day",
+      isToday ? "Add your own notes below anytime. They're saved on this phone." : ""));
   } else {
     if (e.summary) body.append(el("p", "log-summary", e.summary));
     const grid = el("div", "log-grid");
@@ -1176,7 +1254,7 @@ function sayBegin() {
   $("#stop-btn").disabled = false;
 }
 function sayPush(text) {
-  String(text).split(/(?<=[.!?])\s+(?=[A-Z0-9“"'(])/).forEach(s => { s = s.trim(); if (s) speech.queue.push(s); });
+  String(text).replace(/([.!?])\s+(?=[A-Z0-9“"'(])/g, "$1\u0000").split("\u0000").forEach(s => { s = s.trim(); if (s) speech.queue.push(s); });
   pump();
 }
 function sayEnd() { speech.closed = true; pump(); }
@@ -1418,15 +1496,13 @@ function addTurn(kind, text, whoLabel) {
   return tx;
 }
 
-/* ---------- ask (uses Claude via the page's sample capability) ---------- */
+/* ---------- ask (Claude API with the owner's key, or offline from the board) ---------- */
 async function ensureSample() {
-  if (sampleChecked) return sampleFn;
-  sampleFn = await samplePromise;
-  sampleChecked = true;
-  if (sampleFn && typeof sampleFn.limits === "function") {
-    try { const lim = await sampleFn.limits(); toolsOK = !!(lim && lim.tools); } catch (e) { toolsOK = false; }
-  }
-  if (!sampleFn) disableAsk("Conversation isn't available in this view. Briefings and project briefs still work.");
+  sampleFn = window.DeckAI ? window.DeckAI.sampler() : null;
+  toolsOK = !!sampleFn;
+  const n = $("#ask-note");
+  if (sampleFn) { n.hidden = true; n.textContent = ""; }
+  else { n.textContent = "Offline mode: she answers from your board. Add a Claude API key in Settings for open questions."; n.hidden = false; }
   return sampleFn;
 }
 function disableAsk(msg) {
@@ -1503,7 +1579,10 @@ const updateTool = {
 function errorCopy(code) {
   switch (code) {
     case "rate_limited": return "Too many requests just now. Give it a minute and ask again.";
-    case "session_expired": return "Your claude.ai session expired. Sign in again to keep talking.";
+    case "bad_key": return "The API key didn't work. Check it in Settings.";
+    case "billing": return "Your Anthropic account is out of credit. Top it up in the Anthropic Console.";
+    case "offline": return "No connection right now. Ask about deadlines, flags or the checklist and I'll answer offline.";
+    case "overloaded": return "Claude is busy right now. Try again in a moment.";
     case "refused": return "I can't help with that one. Try asking another way.";
     case "prompt_too_large": return "That's more than I can read at once. Try a shorter question.";
     case "empty_completion": return "I came up empty on that. Try rephrasing.";
@@ -1513,8 +1592,8 @@ function errorCopy(code) {
 async function ask(q) {
   q = q.trim(); if (!q) return;
   const fn = await ensureSample();
-  if (!fn) return;
   addTurn("you", q);
+  if (!fn) { answerOffline(q); return; }
   const bubble = addTurn("ai", "Thinking…");
   if (askCtl) askCtl.abort();
   const ctl = new AbortController(); askCtl = ctl;
@@ -1525,7 +1604,7 @@ async function ask(q) {
     "\n\nChecklist (JSON):\n" + JSON.stringify(checklistSnapshot()) +
     "\n\nRecent daily log entries (JSON):\n" + JSON.stringify(logSnapshot()) +
     "\n\n" + (settings.callsign || "He") + " says: " + q;
-  const input = [{ role: "user", content: rules(withTools) }].concat(history.slice(-8), [{ role: "user", content }]);
+  const input = history.slice(-8).concat([{ role: "user", content }]);
   let spokenTo = 0, latest = "";
   const flushSentences = (text, final) => {
     const re = /[.!?…](?=["”')\]]?\s)|\n/g; re.lastIndex = spokenTo;
@@ -1535,8 +1614,8 @@ async function ask(q) {
     spokenTo = from;
   };
   try {
-    const opts = { modelTier: "quick", signal: ctl.signal, onText: ({ text }) => { latest = text; bubble.textContent = text; flushSentences(text, false); } };
-    if (withTools) opts.tools = [updateTool, checklistTool]; else opts.cache = false;
+    const opts = { system: rules(withTools), signal: ctl.signal, onText: ({ text }) => { latest = text; bubble.textContent = text; flushSentences(text, false); } };
+    if (withTools) opts.tools = [updateTool, checklistTool];
     const res = await fn(input, opts);
     latest = res.text; bubble.textContent = res.text;
     flushSentences(res.text, true);
@@ -1544,7 +1623,11 @@ async function ask(q) {
     if (history.length > 12) history = history.slice(-12);
   } catch (e) {
     const code = e && e.code;
-    if (code === "cancelled") { bubble.textContent = (e.text || latest || "") + (e.text || latest ? " …" : "Stopped."); }
+    if (code === "offline" || code === "network") {
+      bubble.parentElement.remove();
+      addTurn("sys", errorCopy(code));
+      answerOffline(q, true);
+    } else if (code === "cancelled") { bubble.textContent = (e.text || latest || "") + (e.text || latest ? " …" : "Stopped."); }
     else if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
       bubble.parentElement.remove();
       disableAsk("Conversation is off for this page, so she can't answer questions here. Briefings and project briefs still work.");
@@ -1562,6 +1645,114 @@ async function ask(q) {
     sayEnd();
   }
 }
+/* ---------- offline answers: grounded only in what's on the board ---------- */
+const STOP = new Set(["and", "the", "for", "with", "project", "first", "from", "into", "our", "my"]);
+function words(t) { return String(t || "").toLowerCase().split(/[^a-z0-9.]+/).filter(w => (w.length > 2 || /\d/.test(w)) && !STOP.has(w)); }
+function findProject(q) {
+  const t = " " + q.toLowerCase() + " ";
+  let best = null, score = 0;
+  projects.forEach(p => {
+    let sc = t.includes(p.name.toLowerCase()) ? 5 : 0;
+    words(p.name + " " + p.id.replace(/-/g, " ")).forEach(w => { if (t.includes(w)) sc += 1; });
+    words((p.category || "") + " " + (p.org || "")).forEach(w => { if (t.includes(" " + w)) sc += 0.5; });
+    if (sc > score) { score = sc; best = p; }
+  });
+  return score >= 0.5 ? best : null;
+}
+function findItem(q) {
+  const qw = new Set(words(q)); let best = null, score = 0;
+  checklist.forEach(i => { const sc = words(i.text).filter(w => qw.has(w)).length; if (sc > score) { score = sc; best = i; } });
+  return score ? best : null;
+}
+function dueLine(p) {
+  const d = daysUntil(p.due);
+  if (d == null) return "";
+  if (d < 0) return p.name + " is " + plural(-d, "day", "days") + " past due.";
+  if (d === 0) return p.name + " is due today.";
+  return p.name + " is " + plural(d, "day", "days") + " out" + (d >= 14 ? ", about " + plural(Math.round(d / 7), "week", "weeks") : "") + ", on " + fmtShort(p.due) + ".";
+}
+function attentionLines() {
+  const live = projects.filter(isLive), out = [];
+  const dated = live.filter(p => p.due).map(p => ({ p, d: daysUntil(p.due) })).sort((a, b) => a.d - b.d);
+  dated.filter(x => x.d <= 14).forEach(x => out.push(dueLine(x.p)));
+  live.filter(p => p.status === "watch").forEach(p => out.push(p.name + " is on watch" + (p.flags[0] ? ": " + trimDot(p.flags[0]) : "") + "."));
+  live.filter(p => p.status !== "watch" && p.flags.length).slice(0, 3).forEach(p => out.push("Flag on " + p.name + ": " + trimDot(p.flags[0]) + "."));
+  if (checkLoaded) {
+    const st = checkStats();
+    if (st.openDaily.length) out.push("Today's routine still has " + st.openDaily.slice(0, 3).map(i => trimDot(i.text)).join(", ") + ".");
+    if (st.openTodos.length) out.push(plural(st.openTodos.length, "to-do is", "to-dos are") + " open, starting with " + trimDot(st.openTodos[0].text) + ".");
+  }
+  if (!out.length) out.push(dated.length ? "Nothing urgent. " + dueLine(dated[0].p) : "Nothing urgent on the board.");
+  return out;
+}
+async function answerOffline(q, quiet) {
+  const nm = settings.name || "ASTRA", t = q.toLowerCase().trim();
+  let out = [], m;
+  const say = lines => {
+    const text = lines.filter(Boolean).join(" ");
+    sayBegin(); sayPush(text); sayEnd();
+    addTurn("ai", text, nm + " · offline");
+  };
+  try {
+    if ((m = /^(?:please\s+)?(?:add|put)\s+(.+?)\s+(?:to|on)\s+(?:my\s+|the\s+)?(daily routine|routine|daily list|checklist|to-?do(?: list)?|list)[.!]?$/i.exec(q.trim()))) {
+      const daily = /daily|routine/i.test(m[2]);
+      const text = m[1].replace(/^["“']|["”']$/g, "");
+      await checklistTool.execute({ action: "add", text, daily });
+      return say(["Added " + trimDot(text) + " to your " + (daily ? "daily routine" : "checklist") + "."]);
+    }
+    if ((m = /\bmark\s+(?:the\s+)?(.+?)\s+(?:as\s+|on\s+)*(active|watch|planning|parked|done)\b/i.exec(q))) {
+      const p = findProject(m[1]);
+      if (!p) return say(["I couldn't tell which project you meant. Use the name on its card."]);
+      await updateTool.execute({ id: p.id, status: m[2].toLowerCase() });
+      return say(["Done. " + p.name + " is now " + (m[2].toLowerCase() === "watch" ? "on watch" : m[2].toLowerCase()) + "."]);
+    }
+    if ((m = /\bset\s+(?:the\s+)?next\s+(?:step|action)\s+(?:for|on)\s+(.+?)\s+to\s+(.+)$/i.exec(q))) {
+      const p = findProject(m[1]);
+      if (!p) return say(["I couldn't tell which project you meant. Use the name on its card."]);
+      await updateTool.execute({ id: p.id, next_action: trimDot(m[2]) });
+      return say(["Logged. Next on " + p.name + ": " + trimDot(m[2]) + "."]);
+    }
+    if ((m = /\b(?:check off|tick off|cross off|uncheck)\s+(.+)/i.exec(q))) {
+      const it = findItem(m[1]);
+      if (!it) return say(["I couldn't find that on your checklist."]);
+      const action = /uncheck/i.test(q) ? "uncheck" : "check";
+      await checklistTool.execute({ action, item_id: it.id });
+      return say([(action === "check" ? "Checked off " : "Unchecked ") + trimDot(it.text) + "."]);
+    }
+  } catch (e) { return say([String((e && e.message) || "That change didn't save.")]); }
+
+  const p = findProject(q);
+  if (/\b(attention|urgent|this week|priorit|what.*(today|next|now))/.test(t) && !p) out = attentionLines();
+  else if (p) {
+    out.push(p.name + " is " + (p.status === "watch" ? "on watch" : STATUS[p.status].label.toLowerCase()) + ".");
+    if (p.due) out.push(dueLine(p));
+    if (p.progress != null) out.push("Progress is at " + Math.round(p.progress) + " percent.");
+    p.flags.slice(0, 2).forEach(f => out.push("Flag: " + trimDot(f) + "."));
+    if (isLive(p)) out.push(p.next.trim() ? "Focus next on " + trimDot(p.next) + "." : "No next action logged yet.");
+  }
+  else if (/\b(deadline|due|horizon|coming up|calendar)\b/.test(t)) {
+    const dated = projects.filter(x => isLive(x) && x.due).sort((a, b) => daysUntil(a.due) - daysUntil(b.due));
+    out = dated.length ? dated.slice(0, 3).map(dueLine) : ["No dates on the board yet."];
+  }
+  else if (/\b(flag|flags|risk|blocker)/.test(t)) {
+    const fl = projects.filter(isLive).filter(x => x.flags.length);
+    out = fl.length ? fl.slice(0, 4).map(x => x.name + ": " + trimDot(x.flags[0]) + ".") : ["Nothing flagged."];
+  }
+  else if (/\b(checklist|to-?do|routine|list)\b/.test(t)) {
+    const st = checkStats();
+    out.push("Checklist: " + st.done + " of " + st.total + " done today.");
+    st.openDaily.concat(st.openTodos).slice(0, 4).forEach(i => out.push("Open: " + trimDot(i.text) + "."));
+  }
+  else if (/\b(log|yesterday|last night|recap)\b/.test(t)) {
+    const l = logs.filter(hasBody).sort((a, b) => a.date < b.date ? 1 : -1)[0];
+    out = l ? [fmtLong(parseISO(l.date)) + ": " + trimDot(l.title || "") + ".", l.summary] : ["The log is empty so far."];
+  }
+  else if (/\b(brief|status|board|summary|overview)\b/.test(t)) out = buildBriefing();
+  else out = ["Offline, I can only answer from the board: deadlines, flags, the checklist, the log, or any project by name. I can also add to the checklist, mark a project's status, or set its next step. Add an API key in Settings for anything else."];
+  if (quiet && out.length > 6) out = out.slice(0, 6);
+  say(out);
+}
+
 $("#ask-form").addEventListener("submit", e => {
   e.preventDefault();
   const inp = $("#ask-input"); const q = inp.value; inp.value = "";
@@ -1668,7 +1859,7 @@ function syncSettingsForm() {
   $("#s-pitch-val").textContent = Number(settings.pitch).toFixed(2);
   populateVoiceSelect();
 }
-$("#open-settings").addEventListener("click", () => { syncSettingsForm(); openDrawer($("#settings-drawer")); });
+$("#open-settings").addEventListener("click", () => { syncSettingsForm(); syncAISettings(); openDrawer($("#settings-drawer")); });
 $("#settings-form").addEventListener("submit", e => e.preventDefault());
 $("#s-name").addEventListener("input", e => { settings.name = e.target.value.trim() || "ASTRA"; local.set("name", settings.name); applyNames(); });
 $("#s-callsign").addEventListener("input", e => { settings.callsign = e.target.value.trim(); local.set("callsign", settings.callsign); });
@@ -1680,33 +1871,26 @@ $("#s-test").addEventListener("click", () => {
   sayBegin(); sayPush((settings.name || "ASTRA") + " online. All systems nominal, " + (settings.callsign || "boss") + ". Say the word and I'll run the board."); sayEnd();
 });
 
-/* ---------- capabilities: registry + write access ---------- */
+/* ---------- on-device registry (replaces the claude.ai database) ---------- */
 setState("standby");
-(async () => {
-  if (!window.claude || typeof window.claude.use !== "function") { db = false; render(); return; }
-  claude.use("user").then(async u => {
-    if (!u) return;
-    try { canWrite = await u.can("data.write"); } catch (e) { canWrite = null; }
-    $("#ro-badge").hidden = canWrite !== false;
-    $("#add-btn").hidden = canWrite === false;
-    render();
-  });
-  const store = await claude.use("db");
-  if (!store) { db = false; $("#add-btn").hidden = true; render(); return; }
-  db = store;
+(() => {
+  db = window.DeckDB || false;
+  if (!db) { render(); return; }
+  canWrite = true;
+  $("#ro-badge").hidden = true;
   db.collection("projects").onSnapshot(snap => {
     projects = snap.docs.map(d => normalize(d.id, d.data()));
     loaded = true;
     render();
   }, err => {
-    if (!loaded) { db = false; render(); }
+    if (!loaded) { loaded = true; projects = []; render(); }
   });
   db.collection("checklist").onSnapshot(snap => {
     checklist = snap.docs.map(d => normCheck(d.id, d.data()));
     checkLoaded = true;
     renderChecklist();
   }, err => {
-    if (!checkLoaded) { checkLoaded = true; checklist = []; renderChecklist(); checkNote("The checklist didn't load. Reload the page to try again."); }
+    if (!checkLoaded) { checkLoaded = true; checklist = []; renderChecklist(); checkNote("The checklist didn't load. Reopen the app to try again."); }
   });
   db.collection("log").orderBy("date", "desc").limit(60).onSnapshot(snap => {
     logs = snap.docs.map(d => normLog(d.id, d.data()));
@@ -1716,8 +1900,89 @@ setState("standby");
     if (!logLoaded) { logLoaded = true; logs = []; renderLog(); }
   });
 })();
+
+/* ---------- settings: AI link ---------- */
+function syncAISettings() {
+  const sel = $("#s-model");
+  if (!sel.options.length) DeckAI.MODELS.forEach(m => { const o = el("option", null, m.label); o.value = m.id; sel.append(o); });
+  sel.value = DeckAI.getModel();
+  const st = $("#s-key-state"), has = DeckAI.hasKey();
+  st.textContent = has ? "Key saved · " + DeckAI.maskedKey() : "No key · offline mode";
+  st.classList.toggle("on", has);
+  $("#s-key-clear").hidden = !has;
+  $("#s-key").value = "";
+}
+$("#s-key-save").addEventListener("click", () => {
+  const k = $("#s-key").value.trim();
+  const st = $("#s-key-state");
+  if (!/^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(k)) { st.textContent = "That doesn't look like a Claude API key (sk-ant-…)."; st.classList.remove("on"); return; }
+  DeckAI.setKey(k); history = []; syncAISettings(); ensureSample();
+});
+$("#s-key-clear").addEventListener("click", () => { DeckAI.clearKey(); history = []; syncAISettings(); ensureSample(); });
+$("#s-model").addEventListener("change", e => { DeckAI.setModel(e.target.value); history = []; });
+
+/* ---------- settings: backup ---------- */
+function dataMsg(t, bad) { const m = $("#d-msg"); m.textContent = t; m.classList.toggle("bad", !!bad); }
+$("#d-export").addEventListener("click", async () => {
+  const data = JSON.stringify(db.exportAll(), null, 2);
+  const name = "command-deck-backup-" + isoToday() + ".json";
+  const file = new File([data], name, { type: "application/json" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "Command Deck backup" }); dataMsg("Backup ready"); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const a = el("a"); a.href = URL.createObjectURL(file); a.download = name; document.body.append(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  dataMsg("Backup saved");
+});
+$("#d-import").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const counts = db.importAll(JSON.parse(await f.text()), "merge");
+    Object.assign(settings, { name: local.get("name", settings.name), callsign: local.get("callsign", settings.callsign) });
+    applyNames(); syncSettingsForm();
+    dataMsg("Imported " + plural(counts.projects || 0, "project", "projects") + ", " + plural(counts.checklist || 0, "checklist item", "checklist items") + " and " + plural(counts.log || 0, "log entry", "log entries") + ".");
+  } catch (err) { dataMsg(err && err.code === "invalid_argument" ? err.message : "Couldn't read that file.", true); }
+});
+$("#d-clear").addEventListener("click", () => { $("#d-clear-confirm").hidden = false; });
+$("#d-clear-no").addEventListener("click", () => { $("#d-clear-confirm").hidden = true; });
+$("#d-clear-yes").addEventListener("click", () => { db.clearAll(); $("#d-clear-confirm").hidden = true; dataMsg("Board erased"); });
+
+/* ---------- iOS: speech must start inside a tap; prime it on the first one ---------- */
+let speechPrimed = false;
+function primeSpeech() {
+  if (speechPrimed || !synth) return;
+  speechPrimed = true;
+  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; synth.speak(u); } catch (e) {}
+  if (!voices.length) loadVoices();
+}
+["touchend", "click", "keydown"].forEach(ev => document.addEventListener(ev, primeSpeech, { capture: true, passive: true }));
+
+/* ---------- Home Screen app: offline shell + update prompt ---------- */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(reg => {
+      const offer = w => {
+        if (!w || !navigator.serviceWorker.controller || $("#update-bar")) return;
+        const bar = el("div", "update-bar"); bar.id = "update-bar"; bar.setAttribute("role", "status");
+        bar.append(el("span", null, "New version ready"));
+        const b = el("button", "btn sm primary", "Reload"); b.type = "button";
+        b.addEventListener("click", () => w.postMessage("skip-waiting"));
+        bar.append(b); document.body.append(bar);
+      };
+      if (reg.waiting) offer(reg.waiting);
+      reg.addEventListener("updatefound", () => {
+        const w = reg.installing;
+        if (w) w.addEventListener("statechange", () => { if (w.state === "installed") offer(w); });
+      });
+    }).catch(() => {});
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  });
+}
 render();
 })();
 </script>
 
-</body></html>
+</body>
+</html>
